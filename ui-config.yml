@@ -1,0 +1,21 @@
+---
+antora:
+  name: modules
+  dir: www
+  modules:
+    - name: "01-switch-registries"
+      label: "Switch Registries"
+      solveButton: true
+    - name: "02-switch-an-image"
+      label: "Switch An Image"
+      solveButton: true
+    - name: "03-rollback-a-host"
+      label: "Rollback A Host"
+      solveButton: true
+    - name: "04-move-httpd-in-image"
+      label: "Move Httpd In Image"
+      solveButton: true
+
+tabs:
+  - name: ">_ terminal"
+    url: /wetty
