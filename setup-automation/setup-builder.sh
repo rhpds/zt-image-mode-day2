@@ -15,7 +15,7 @@ EOF
 
 # Log into terms based registry and stage bootc and bib images
 BOOTC_RHEL_VER=10.0
-podman pull registry.redhat.io/rhel9/rhel-bootc:$BOOTC_RHEL_VER registry.redhat.io/rhel9/bootc-image-builder:$BOOTC_RHEL_VER
+podman pull registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER registry.redhat.io/rhel10/bootc-image-builder:$BOOTC_RHEL_VER
 
 # Start the target VM, created from the image-mode-basics lab image and maintained in the GCP compute image for this lab
 
@@ -65,7 +65,7 @@ EOF
 
 # create updated bootc containerfile from image-mode-basics
 cat <<EOF> Containerfile
-FROM registry.redhat.io/rhel9/rhel-bootc:$BOOTC_RHEL_VER
+FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
 
 ADD etc /etc
 
@@ -76,7 +76,7 @@ EOF
 
 # create V3 index.html relocated containerfile
 cat <<EOM> Containerfile.index
-FROM registry.redhat.io/rhel9/rhel-bootc:$BOOTC_RHEL_VER
+FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
 
 ADD etc /etc
 
