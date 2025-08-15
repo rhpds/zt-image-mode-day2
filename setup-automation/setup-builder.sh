@@ -64,7 +64,7 @@ cat <<EOF> ~/config.json
 EOF
 
 # create updated bootc containerfile from image-mode-basics
-cat <<EOF> Containerfile
+cat <<EOF> ~/Containerfile
 FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
 
 ADD etc /etc
@@ -75,7 +75,7 @@ RUN systemctl enable httpd
 EOF
 
 # create V3 index.html relocated containerfile
-cat <<EOM> Containerfile.index
+cat <<EOM> ~/Containerfile.index
 FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
 
 ADD etc /etc
