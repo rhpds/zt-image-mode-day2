@@ -17,11 +17,11 @@ virtualmachines:
   - name: "imrhel"
     image: "rhel-10-0-07-09-25-3"
     bootloader: efi
-    memory: "4G"
-    cores: 1
+    memory: "2G"
+    cores: 2
     image_size: "40G"
     tags:
       - key: "AnsibleGroup"
-        value: "bastions"
+        value: "nodes"
     networks:
       - default
