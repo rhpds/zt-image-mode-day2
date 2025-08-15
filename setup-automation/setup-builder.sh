@@ -27,14 +27,14 @@ dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noar
 dnf install -y certbot
 
 # request certificates
-certbot certonly --standalone --preferred-challenges http -d builder.${GUID}.${DOMAIN} --non-interactive --agree-tos -m trackbot@instruqt.com -v
+certbot certonly --standalone --preferred-challenges http -d builder."${GUID}"."${DOMAIN}" --non-interactive --agree-tos -m trackbot@instruqt.com -v
 
 # run a local registry with the provided certs
 podman run --privileged -d \
   --name registry \
   -p 5000:5000 \
-  -v /etc/letsencrypt/live/builder.${GUID}.${DOMAIN}/fullchain.pem:/certs/fullchain.pem \
-  -v /etc/letsencrypt/live/builder.${GUID}.${DOMAIN}/privkey.pem:/certs/privkey.pem \
+  -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/fullchain.pem:/certs/fullchain.pem \
+  -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/privkey.pem:/certs/privkey.pem \
   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/fullchain.pem \
   -e REGISTRY_HTTP_TLS_KEY=/certs/privkey.pem \
   quay.io/mmicene/registry:2
