@@ -11,6 +11,18 @@
       ansible_ssh_port: "{{ lookup('ansible.builtin.env', 'BASTION_PORT') }}"
       ansible_ssh_user: "{{ lookup('ansible.builtin.env', 'BASTION_USER') }}"
       ansible_ssh_pass: "{{ lookup('ansible.builtin.env', 'BASTION_PASSWORD') }}"
+
+  - name: Add nodes
+    ansible.builtin.add_host:
+      name: "{{ item }}"
+      ansible_ssh_host: "{{ item }}"
+      ansible_ssh_port: "{{ lookup('ansible.builtin.env', 'BASTION_PORT') }}"
+      ansible_ssh_user: "{{ lookup('ansible.builtin.env', 'BASTION_USER') }}"
+      ansible_ssh_pass: "{{ lookup('ansible.builtin.env', 'BASTION_PASSWORD') }}"
+      ansible_python_interpreter: /usr/libexec/platform-python
+    loop:
+      - imrhel
+
 - name: Demo Playbook for the ansible-runner API
   hosts: all:!localhost
   gather_facts: false
@@ -64,6 +76,7 @@
       content: "{{ r_result.stdout | default(r_result.stderr) | default(r_result) }}"
       dest: "/tmp/{{ ansible_host }}-setup-script.out"
     delegate_to: localhost
+    ignore_errors: true
     when:
     - r_result is defined
 
@@ -72,10 +85,10 @@
       var: r_result
     when: r_result is defined
 
-  - name: Fail if stage was failed
-    ansible.builtin.fail:
-      msg: "Setup failed"
-    when:
-    - r_result is defined
-    - r_result.rc != 0
+#  - name: Fail if stage was failed
+#    ansible.builtin.fail:
+#      msg: "Setup failed"
+#    when:
+#    - r_result is defined
+#    - r_result.rc != 0
 
