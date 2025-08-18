@@ -18,6 +18,6 @@ antora:
 
 tabs:
   - name: ">_ Builder"
-    url: /wetty
+    url: /wetty/ssh/root
   - name: ">_ Image mode host"
-    url: /wetty_imrhel
+    url: /wetty_imrhel/ssh/root
