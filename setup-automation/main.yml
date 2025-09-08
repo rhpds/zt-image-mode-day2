@@ -90,8 +90,22 @@
     - r_result is defined
     - r_result.rc != 0
 
-  - name: Reboot image mode target
-    ansible.builtin.reboot:
-    when:
-    - r_result is defined
-    - ansible_ssh_host == "imrhel"
+- name: Create inventory
+  hosts: localhost
+  gather_facts: false
+  vars:
+    guid: "{{ lookup('ansible.builtin.env', 'GUID') }}"
+  tasks:
+  - name: Add rhel2 host
+    ansible.builtin.add_host:
+      name: "rhel2post"
+      ansible_ssh_host: "imrhel"
+      ansible_ssh_user: "root"
+
+- name: Post task(s) for rhel2
+  hosts: rhel2post
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Reboot the system
+      ansible.builtin.reboot:
