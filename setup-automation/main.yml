@@ -83,9 +83,15 @@
       var: r_result
     when: r_result is defined
 
-#  - name: Fail if stage was failed
-#    ansible.builtin.fail:
-#      msg: "Setup failed"
-#    when:
-#    - r_result is defined
-#    - r_result.rc != 0
+  - name: Fail if stage was failed
+    ansible.builtin.fail:
+      msg: "Setup failed"
+    when:
+    - r_result is defined
+    - r_result.rc != 0
+
+  - name: Reboot image mode target
+    ansible.builtin.reboot:
+    when:
+    - r_result is defined
+    - ansible_ssh_host == "imrhel"

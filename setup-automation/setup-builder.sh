@@ -28,6 +28,7 @@ certbot certonly --standalone --preferred-challenges http -d builder."${GUID}"."
 # run a local registry with the provided certs
 podman run --privileged -d \
   --name registry \
+  -p 443:5000 \
   -p 5000:5000 \
   -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/fullchain.pem:/certs/fullchain.pem \
   -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/privkey.pem:/certs/privkey.pem \
@@ -61,7 +62,7 @@ EOF
 
 # create updated bootc containerfile from image-mode-basics
 cat <<EOF> ~/Containerfile
-FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
+FROM registry.redhat.io/rhel9/rhel-bootc:9.6
 
 ADD etc /etc
 
