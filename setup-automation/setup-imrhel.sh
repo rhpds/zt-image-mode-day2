@@ -1,25 +1,25 @@
 #!/bin/bash
 
 
-## Convert the system to Image Mode
-# system-reinstall-bootc quay.io/toharris/rhel-bootc:summit-2025
-# Found only one user (root) with 1 SSH authorized keys.
-# Would you like to import its SSH authorized keys
-# into the root user on the new bootc system? yes
+## Convert a system to Image Mode
+# Command line created by system-reinstall-bootc 
+# Pulls the 9.6 basics image from quay to use as the baseline host in the lab
+#
+podman run --privileged --pid=host --user=root:root -v /var/lib/containers:/var/lib/containers -v /dev:/dev --security-opt label=type:unconfined_t -v /:/target quay.io/mmicene/im-day2-tgt:9.6 bootc install to-existing-root --acknowledge-destructive --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
 
-# Going to run command "podman" "run" "--privileged" "--pid=host" "--user=root:root" "-v" "/var/lib/containers:/var/lib/containers" "-v" "/dev:/dev" "--security-opt" "label=type:unconfined_t" "-v" "/:/target" "-v" "/tmp/.tmp08wosc:/bootc_authorized_ssh_keys/root" "quay.io/toharris/rhel-bootc:summit-2025" "bootc" "install" "to-existing-root" "--acknowledge-destructive" "--root-ssh-authorized-keys" "/bootc_authorized_ssh_keys/root"
-
-podman run --privileged --pid=host --user=root:root -v /var/lib/containers:/var/lib/containers -v /dev:/dev --security-opt label=type:unconfined_t -v /:/target quay.io/toharris/rhel-bootc:summit-2025 bootc install to-existing-root --acknowledge-destructive --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
+# With the new deployment created, we can copy directly into the /etc directory to make updates we want in the running bootc target
+# The deployment checksum and resulting directory will change on each provision, this is how we detect the location
+STATEROOT=$(ls -d /ostree/deploy/default/deploy/*/)
 
 # Overwrite the image configs with the lab configs
-STATEROOT=$(ls -d /ostree/deploy/default/deploy/*/)
-# Add password root logins
+# Add password root logins to sshD
 echo "PermitRootLogin yes" >> $STATEROOT/etc/ssh/sshd_config.d/ansible_permit_root_login.conf
 
 # Add name based resolution for internal IPs
 echo "10.0.2.2 builder.${GUID}.${DOMAIN}" >> $STATEROOT/etc/hosts
 
 # Copy the existing credentials to the new bootc tree
+# don't replace passwd/group files as this will cause issues with UID/GIDs
 \cp -f /etc/shadow $STATEROOT/etc/shadow
 
 echo "DONE" >> /root/job.log
