@@ -5,17 +5,13 @@ egress:
   - ports:
       - protocol: TCP
         port: 443
-  - to:
-      - podSelector:
-          matchLabels:
-            kubevirt.io: virt-launcher
-  - ports:
       - protocol: TCP
         port: 5000
   - to:
       - podSelector:
           matchLabels:
             kubevirt.io: virt-launcher
+
 ingress:
   - from:
       - podSelector:
