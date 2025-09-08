@@ -9,14 +9,17 @@
 
 # Going to run command "podman" "run" "--privileged" "--pid=host" "--user=root:root" "-v" "/var/lib/containers:/var/lib/containers" "-v" "/dev:/dev" "--security-opt" "label=type:unconfined_t" "-v" "/:/target" "-v" "/tmp/.tmp08wosc:/bootc_authorized_ssh_keys/root" "quay.io/toharris/rhel-bootc:summit-2025" "bootc" "install" "to-existing-root" "--acknowledge-destructive" "--root-ssh-authorized-keys" "/bootc_authorized_ssh_keys/root"
 
-# podman run --privileged --pid=host --user=root:root -v /var/lib/containers:/var/lib/containers -v /dev:/dev --security-opt label=type:unconfined_t -v /:/target quay.io/toharris/rhel-bootc:summit-2025 bootc install to-existing-root --acknowledge-destructive --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
+podman run --privileged --pid=host --user=root:root -v /var/lib/containers:/var/lib/containers -v /dev:/dev --security-opt label=type:unconfined_t -v /:/target quay.io/toharris/rhel-bootc:summit-2025 bootc install to-existing-root --acknowledge-destructive --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
 
+# Overwrite the image configs with the lab configs
 # Add password root logins
-echo "PermitRootLogin yes" >> /etc/ssh/sshd_config.d/ansible_permit_root_login.conf
+echo "PermitRootLogin yes" >> /ostree/deploy/default/deploy/*/etc/ssh/sshd_config.d/ansible_permit_root_login.conf
 
 # Add name based resolution for internal IPs
-echo "10.0.2.2 builder.${GUID}.${DOMAIN}" >> /etc/hosts
-cp /etc/hosts ~/etc/hosts
+echo "10.0.2.2 builder.${GUID}.${DOMAIN}" >> /ostree/deploy/default/deploy/*/etc/hosts
+
+# Copy the existing credentials to the new bootc tree
+\cp -f /etc/shadow /ostree/deploy/default/deploy/*/etc/shadow
 
 echo "DONE" >> /root/job.log
 
