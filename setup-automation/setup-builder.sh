@@ -17,10 +17,6 @@ EOF
 BOOTC_RHEL_VER=10.0
 podman pull registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER registry.redhat.io/rhel10/bootc-image-builder:$BOOTC_RHEL_VER
 
-# Start the target VM, created from the image-mode-basics lab image and maintained in the GCP compute image for this lab
-
-# virsh start bootc2
-
 # set up SSL for fully functioning registry
 # Enable EPEL for RHEL 10
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
@@ -32,7 +28,7 @@ certbot certonly --standalone --preferred-challenges http -d builder."${GUID}"."
 # run a local registry with the provided certs
 podman run --privileged -d \
   --name registry \
-  -p 443:5000 \
+  -p 5000:5000 \
   -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/fullchain.pem:/certs/fullchain.pem \
   -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/privkey.pem:/certs/privkey.pem \
   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/fullchain.pem \
@@ -96,7 +92,4 @@ EOM
 # Add name based resolution for internal IPs
 echo "10.0.2.2 builder.${GUID}.${DOMAIN}" >> /etc/hosts
 cp /etc/hosts ~/etc/hosts
-
-#podman build -t ${HOSTNAME}.${INSTRUQT_PARTICIPANT_ID}.instruqt.io:5000/test-bootc .
-#podman push ${HOSTNAME}.${INSTRUQT_PARTICIPANT_ID}.instruqt.io:5000/test-bootc
 
