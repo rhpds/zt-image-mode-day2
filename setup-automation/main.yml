@@ -102,10 +102,3 @@
       ansible_ssh_host: "imrhel"
       ansible_ssh_user: "root"
 
-- name: Post task(s) for rhel2
-  hosts: rhel2post
-  gather_facts: true
-  become: true
-  tasks:
-    - name: Reboot the system
-      ansible.builtin.reboot:
