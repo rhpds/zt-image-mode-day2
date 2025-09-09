@@ -39,3 +39,42 @@ virtualmachines:
         value: "nodes"
     networks:
       - default
+
+containers:
+  # Container registry (following Zero Touch patterns)
+  - name: "registry"
+    image: "quay.io/mmicene/registry:2"
+    memory: "1G"                   # Appropriate for bootc lab registry
+    cpu: "1"
+    ports:
+      - name: registry
+        containerPort: 5000
+        protocol: TCP
+    environment:
+      # Registry configuration (simplified for container environment)
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: "/var/lib/registry"
+      REGISTRY_HTTP_ADDR: "0.0.0.0:5000"
+      REGISTRY_PULL_TOKEN: "{{ lookup('ansible.builtin.env', 'REGISTRY_PULL_TOKEN') | default('') }}"
+      GUID: "{{ guid }}"
+      DOMAIN: "{{ domain }}"
+    volumes:
+      - name: registry-data
+        emptyDir: {}
+    volumeMounts:
+      - name: registry-data
+        mountPath: "/var/lib/registry"
+    # Note: SSL setup moved to VM-based approach for proper certificate handling
+    services:
+      - name: registry
+        ports:
+          - port: 5000
+            protocol: TCP
+            targetPort: 5000
+            name: registry
+    routes:
+      - name: registry
+        host: registry
+        service: registry
+        targetPort: 5000
+        tls: true
+        tls_termination: Edge         # Standard Zero Touch TLS pattern
