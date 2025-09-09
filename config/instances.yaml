@@ -41,12 +41,12 @@ virtualmachines:
       - default
 
 containers:
-  - name: "registry"
+  - name: "bootc-registry"
     image: "quay.io/mmicene/registry:2"
     memory: "1G"
     cpu: "1"
     ports:
-      - name: registry
+      - name: bootc-registry
         containerPort: 5000
         protocol: TCP
     environment:
@@ -62,16 +62,16 @@ containers:
       - name: registry-data
         mountPath: "/var/lib/registry"
     services:
-      - name: registry
+      - name: bootc-registry
         ports:
           - port: 5000
             protocol: TCP
             targetPort: 5000
-            name: registry
+            name: bootc-registry
     routes:
-      - name: registry
-        host: registry
-        service: registry
+      - name: bootc-registry
+        host: bootc-registry
+        service: bootc-registry
         targetPort: 5000
         tls: true
         tls_termination: Edge

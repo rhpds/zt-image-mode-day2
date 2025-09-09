@@ -9,7 +9,7 @@ egress:
     to:
       - podSelector:
           matchLabels:
-            app.kubernetes.io/name: registry 
+            app.kubernetes.io/name: bootc-registry 
 
 ingress:
   - ports:
