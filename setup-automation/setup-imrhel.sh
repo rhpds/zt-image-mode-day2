@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Not sure this is causing other issues but has interfered with the reboot
+systemctl disable --now dnf-automatic.timer
 
 ## Convert a system to Image Mode
 # Command line created by system-reinstall-bootc 
