@@ -1,14 +1,4 @@
----
-# Registry-specific firewall rules
-# Alternative firewall.yaml configuration for VM-to-container 443 access
 egress:
-  - ports:
-      - protocol: TCP
-        port: 443
-    to:
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: bootc-registry
   - ports:
       - protocol: TCP
         port: 5000
@@ -16,15 +6,15 @@ egress:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: bootc-registry
+  - ports:
+      - protocol: TCP
+        port: 443
 
 ingress:
   - ports:
       - protocol: TCP
-        port: 443
+        port: 5000
     from:
       - podSelector:
           matchLabels:
             kubevirt.io: virt-launcher
-  - ports:
-      - protocol: TCP
-        port: 5000
