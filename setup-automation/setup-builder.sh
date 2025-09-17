@@ -90,7 +90,6 @@ RUN echo "New application coming soon!" > /usr/share/www/html/index.html
 
 EOM
 
-# Add name based resolution for internal IPs
+# Fix on-host FQDN to use local IP instead of cluster IP
 echo "10.0.2.2 builder.${GUID}.${DOMAIN}" >> /etc/hosts
-cp /etc/hosts ~/etc/hosts
 

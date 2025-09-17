@@ -5,18 +5,17 @@ egress:
   - ports:
       - protocol: TCP
         port: 443
-      - protocol: TCP
-        port: 5000
-  - to:
-      - podSelector:
-          matchLabels:
-            kubevirt.io: virt-launcher
 
-ingress:
-  - from:
-      - podSelector:
-          matchLabels:
-            kubevirt.io: virt-launcher
+# Modeled on default SSH egress rule
+  - to:
+    - podSelector:
+        matchLabels:
+          kubevirt.io: virt-launcher
+    ports:
+    - port: 443  # Allow HTTPS between VMs
+
+
+    
 #
 # The following lines are suggested based on Instruqt's allow_external_ingress fields:
 # rhel:
