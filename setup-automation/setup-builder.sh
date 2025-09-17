@@ -23,7 +23,7 @@ dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noar
 dnf install -y certbot
 
 # request certificates
-certbot certonly --eab-kid "${ZEROSSL_EAB_KEY_ID}" --eab-hmac-key "${ZEROSSL_HMAC_KEY}" --server "https://acme.zerossl.com/v2/DV90" --standalone --preferred-challenges http -d builder."${GUID}"."${DOMAIN}" --non-interactive --agree-tos -m trackbot@instruqt.com -v
+certbot certonly --eab-kid "${ZEROSSL_EAB_KEY_ID}" --eab-hmac-key "${ZEROSSL_HMAC_KEY}" --server "https://acme.zerossl.com/v2/DV90" --standalone --preferred-challenges http -d builder-"${GUID}"."${DOMAIN}" --non-interactive --agree-tos -m trackbot@instruqt.com -v
 
 # Don't leak password to users
 rm /var/log/letsencrypt/letsencrypt.log
@@ -33,8 +33,8 @@ podman run --privileged -d \
   --name registry \
   -p 443:5000 \
   -p 5000:5000 \
-  -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/fullchain.pem:/certs/fullchain.pem \
-  -v /etc/letsencrypt/live/builder."${GUID}"."${DOMAIN}"/privkey.pem:/certs/privkey.pem \
+  -v /etc/letsencrypt/live/builder-"${GUID}"."${DOMAIN}"/fullchain.pem:/certs/fullchain.pem \
+  -v /etc/letsencrypt/live/builder-"${GUID}"."${DOMAIN}"/privkey.pem:/certs/privkey.pem \
   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/fullchain.pem \
   -e REGISTRY_HTTP_TLS_KEY=/certs/privkey.pem \
   quay.io/mmicene/registry:2
@@ -94,6 +94,6 @@ RUN echo "New application coming soon!" > /usr/share/www/html/index.html
 EOM
 
 # Add name based resolution for internal IPs
-echo "10.0.2.2 builder.${GUID}.${DOMAIN}" >> /etc/hosts
+echo "10.0.2.2 builder-${GUID}.${DOMAIN}" >> /etc/hosts
 cp /etc/hosts ~/etc/hosts
 
