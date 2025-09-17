@@ -25,6 +25,9 @@ dnf install -y certbot
 # request certificates
 certbot certonly --eab-kid "${ZEROSSL_EAB_KEY_ID}" --eab-hmac-key "${ZEROSSL_HMAC_KEY}" --server "https://acme.zerossl.com/v2/DV90" --standalone --preferred-challenges http -d builder."${GUID}"."${DOMAIN}" --non-interactive --agree-tos -m trackbot@instruqt.com -v
 
+# Don't leak password to users
+rm /var/log/letsencrypt/letsencrypt.log
+
 # run a local registry with the provided certs
 podman run --privileged -d \
   --name registry \
