@@ -11,9 +11,7 @@ virtualmachines:
         value: "bastions"
     networks:
       - default
-    packages:
-      - podman
-      - skopeo
+    packages: []
     services:
       - name: builder-http
         ports:
