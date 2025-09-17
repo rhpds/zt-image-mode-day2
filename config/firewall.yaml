@@ -1,17 +1,30 @@
 ---
 # Registry-specific firewall rules
-# Note: AgnosticD provides defaults for common ports (80, 443, 8080, SSH, etc.)
-
+# Alternative firewall.yaml configuration for VM-to-container 443 access
 egress:
+  - ports:
+      - protocol: TCP
+        port: 443
+    to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: bootc-registry
   - ports:
       - protocol: TCP
         port: 5000
     to:
       - podSelector:
           matchLabels:
-            app.kubernetes.io/name: bootc-registry 
+            app.kubernetes.io/name: bootc-registry
 
 ingress:
+  - ports:
+      - protocol: TCP
+        port: 443
+    from:
+      - podSelector:
+          matchLabels:
+            kubevirt.io: virt-launcher
   - ports:
       - protocol: TCP
         port: 5000
