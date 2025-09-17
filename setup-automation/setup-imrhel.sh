@@ -18,7 +18,7 @@ STATEROOT=$(ls -d /ostree/deploy/default/deploy/*/)
 echo "PermitRootLogin yes" >> $STATEROOT/etc/ssh/sshd_config.d/ansible_permit_root_login.conf
 
 # Add name based resolution for internal IPs
-echo "10.0.2.2 builder.${GUID}.${DOMAIN}" >> $STATEROOT/etc/hosts
+echo "10.0.2.2 builder-${GUID}.${DOMAIN}" >> $STATEROOT/etc/hosts
 
 # Copy the existing credentials to the new bootc tree
 # don't replace passwd/group files as this will cause issues with UID/GIDs
