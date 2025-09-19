@@ -15,19 +15,18 @@ virtualmachines:
       - podman
       - skopeo
     services:
-      - name: builder-http
+      - name: registry-http
         ports:
           - port: 80
             protocol: TCP
             targetPort: 80
-            name: builder-http
+            name: registry-http
     routes:
      - name: registry-http
         host: builder
-        service: builder-http
+        service: registry-http
         targetPort: 80
         tls: false
-
     services:
       - name: registry
         ports:
