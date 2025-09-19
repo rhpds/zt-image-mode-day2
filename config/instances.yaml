@@ -37,7 +37,7 @@ virtualmachines:
         host: builder
         service: registry
         targetPort: 443
-        tls: false
+        tls: true
 
   - name: "imrhel"
     image: "rhel-10-0-07-09-25-3"
