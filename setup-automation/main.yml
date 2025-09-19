@@ -88,8 +88,8 @@
       var: r_result
     when: r_result is defined
 
-- name: Force success for debugging
-    ansible.builtin.set_fact
+  - name: Force success for debugging
+    ansible.builtin.set_fact:
       nofail: foo
 
   - name: Fail if stage was failed
