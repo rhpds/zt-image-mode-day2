@@ -33,8 +33,9 @@ virtualmachines:
         service: registry-http
         targetPort: 80
         tls: false
+        path: "/.well-known/"
       - name: registry
-        host: builder
+        host: registry
         service: registry
         targetPort: 443
         tls: true
