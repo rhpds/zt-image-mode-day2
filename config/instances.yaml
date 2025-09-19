@@ -22,11 +22,12 @@ virtualmachines:
             targetPort: 80
             name: builder-http
     routes:
-      - name: builder-http
+     - name: registry-http
         host: builder
         service: builder-http
         targetPort: 80
         tls: false
+
     services:
       - name: registry
         ports:
