@@ -1,5 +1,6 @@
 #!/bin/bash
 # set -euxo pipefail
+set -x pipefail
 
 # Log into terms based registry and stage bootc and bib images
 mkdir -p ~/.config/containers

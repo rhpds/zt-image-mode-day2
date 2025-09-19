@@ -88,10 +88,15 @@
       var: r_result
     when: r_result is defined
 
+- name: Force success for debugging
+    ansible.builtin.set_fact
+      nofail: foo
+
   - name: Fail if stage was failed
     ansible.builtin.fail:
       msg: "Setup failed"
     when:
+    - nofail is not defined
     - r_result is defined
     - r_result.rc != 0
 
