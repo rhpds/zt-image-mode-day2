@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x pipefail
+set -x 
 
 # Not sure this is causing other issues but has interfered with the reboot
 systemctl disable --now dnf-automatic.timer
