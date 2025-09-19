@@ -24,5 +24,5 @@ echo "PermitRootLogin yes" >> $STATEROOT/etc/ssh/sshd_config.d/ansible_permit_ro
 # don't replace passwd/group files as this will cause issues with UID/GIDs
 \cp -f /etc/shadow $STATEROOT/etc/shadow
 
-echo "DONE" >> /root/job.log
+echo "$MESSAGE" >> /root/job.log
 

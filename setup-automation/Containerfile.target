@@ -1,0 +1,7 @@
+FROM registry.redhat.io/rhel9/rhel-bootc:9.6
+
+RUN echo "%wheel  ALL=(ALL)   NOPASSWD: ALL" >> /etc/sudoers.d/wheel
+
+RUN dnf install -y httpd vim
+RUN systemctl enable httpd
+

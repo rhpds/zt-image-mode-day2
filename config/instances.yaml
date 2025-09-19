@@ -27,6 +27,19 @@ virtualmachines:
         service: builder-http
         targetPort: 80
         tls: false
+    services:
+      - name: registry
+        ports:
+          - port: 443
+            protocol: TCP
+            targetPort: 443
+            name: registry
+    routes:
+      - name: registry
+        host: builder
+        service: registry
+        targetPort: 443
+        tls: false
 
   - name: "imrhel"
     image: "rhel-10-0-07-09-25-3"
