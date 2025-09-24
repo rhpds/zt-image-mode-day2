@@ -92,11 +92,12 @@
     when: r_result is defined
 
   - name: Reboot image mode target
-    ansible.builtin.reboot:
-    when: inventory_hostname == "imrhel"
-    become: true
+    ansible.builtin.shell: /sbin/shutdown -r now "Reboot requested"
     async: 0
     poll: 0
+    ignore_errors: true
+    when: inventory_hostname == "imrhel"
+    become: true
 
   - name: Fail if stage was failed
     ansible.builtin.fail:
