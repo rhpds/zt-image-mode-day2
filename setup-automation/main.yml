@@ -25,6 +25,8 @@
 - name: Demo Playbook for the ansible-runner API
   hosts: all:!localhost
   gather_facts: false
+  vars:
+    devel: true
   tasks:
 
   - ansible.builtin.wait_for_connection:
@@ -88,27 +90,15 @@
       var: r_result
     when: r_result is defined
 
-  - name: Force success for debugging
-    ansible.builtin.set_fact:
-      nofail: foo
+  - name: Reboot image mode target
+    ansible.builtin.reboot:
+    when: inventory_hostname is "imrhel"
 
   - name: Fail if stage was failed
     ansible.builtin.fail:
       msg: "Setup failed"
     when:
-    - nofail is not defined
+    - not devel
     - r_result is defined
     - r_result.rc != 0
-
-- name: Create inventory
-  hosts: localhost
-  gather_facts: false
-  vars:
-    guid: "{{ lookup('ansible.builtin.env', 'GUID') }}"
-  tasks:
-  - name: Add rhel2 host
-    ansible.builtin.add_host:
-      name: "rhel2post"
-      ansible_ssh_host: "imrhel"
-      ansible_ssh_user: "root"
 
