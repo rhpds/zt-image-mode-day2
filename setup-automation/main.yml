@@ -95,6 +95,8 @@
     ansible.builtin.reboot:
     when: inventory_hostname == "imrhel"
     become: true
+    async: 0
+    poll: 0
 
   - name: Fail if stage was failed
     ansible.builtin.fail:
