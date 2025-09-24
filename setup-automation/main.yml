@@ -72,6 +72,7 @@
       ZEROSSL_EAB_KEY_ID: "{{ zerossl_eab_key_id }}"
       ZEROSSL_HMAC_KEY: "{{ zerossl_hmac_key }}"
       MESSAGE: "{{ message }}"
+
   - name: Output script result
     ansible.builtin.debug:
       var: r_result.stdout
@@ -93,6 +94,7 @@
   - name: Reboot image mode target
     ansible.builtin.reboot:
     when: inventory_hostname == "imrhel"
+    become: true
 
   - name: Fail if stage was failed
     ansible.builtin.fail:
