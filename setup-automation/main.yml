@@ -93,7 +93,7 @@
 
   - name: Reboot image mode target
     ansible.builtin.shell: /sbin/shutdown -r now "Reboot requested"
-    async: 0
+    async: 1
     poll: 0
     ignore_errors: true
     when: inventory_hostname == "imrhel"
