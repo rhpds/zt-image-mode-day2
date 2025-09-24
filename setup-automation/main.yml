@@ -92,7 +92,7 @@
 
   - name: Reboot image mode target
     ansible.builtin.reboot:
-    when: inventory_hostname is "imrhel"
+    when: inventory_hostname == "imrhel"
 
   - name: Fail if stage was failed
     ansible.builtin.fail:
