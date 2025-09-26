@@ -93,8 +93,8 @@
     ansible.builtin.fail:
       msg: "Setup failed"
     when:
-      - r_result is defined
-      - r_result.rc != 0
+    - r_result is defined
+    - r_result.rc != 0
 
   - name: Reboot image mode target
     ansible.builtin.shell: /sbin/shutdown -r now "Reboot requested"
