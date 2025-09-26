@@ -25,5 +25,6 @@ echo "PermitRootLogin yes" >> $STATEROOT/etc/ssh/sshd_config.d/ansible_permit_ro
 # don't replace passwd/group files as this will cause issues with UID/GIDs
 \cp -f /etc/shadow $STATEROOT/etc/shadow
 
-echo "$MESSAGE" >> /root/job.log
+# Use local IP for FQDN instead of cluster IP
+echo "10.0.2.2 imrhel.${GUID}.${DOMAIN}" >> $STATEROOT/etc/hosts
 

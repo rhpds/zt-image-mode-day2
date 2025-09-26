@@ -23,11 +23,15 @@ podman pull registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER registry.redhat
 dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 dnf install -y certbot
 
-# request certificates
+# request certificates but don't log keys
+set +x
 certbot certonly --eab-kid "${ZEROSSL_EAB_KEY_ID}" --eab-hmac-key "${ZEROSSL_HMAC_KEY}" --server "https://acme.zerossl.com/v2/DV90" --standalone --preferred-challenges http -d registry-"${GUID}"."${DOMAIN}" --non-interactive --agree-tos -m trackbot@instruqt.com -v
 
 # Don't leak password to users
 rm /var/log/letsencrypt/letsencrypt.log
+
+# reset tracing
+set -x
 
 # run a local registry with the provided certs
 podman run --privileged -d \
@@ -64,19 +68,8 @@ cat <<EOF> ~/config.json
 }
 EOF
 
-# create updated bootc containerfile from image-mode-basics
-cat <<EOF> ~/Containerfile
-FROM registry.redhat.io/rhel9/rhel-bootc:9.6
-
-ADD etc /etc
-
-RUN dnf install -y httpd vim
-RUN systemctl enable httpd
-
-EOF
-
 # create V3 index.html relocated containerfile
-cat <<EOM> ~/Containerfile.index
+cat <<EOM> ~/Containerfile
 FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
 
 ADD etc /etc
