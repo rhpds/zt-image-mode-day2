@@ -1,4 +1,3 @@
-
 ---
 - name: Create inventory
   hosts: localhost
@@ -11,6 +10,17 @@
       ansible_ssh_port: "{{ lookup('ansible.builtin.env', 'BASTION_PORT') }}"
       ansible_ssh_user: "{{ lookup('ansible.builtin.env', 'BASTION_USER') }}"
       ansible_ssh_pass: "{{ lookup('ansible.builtin.env', 'BASTION_PASSWORD') }}"
+  - name: Add nodes
+    ansible.builtin.add_host:
+      name: "{{ item }}"
+      ansible_ssh_host: "{{ item }}"
+      ansible_ssh_port: "{{ lookup('ansible.builtin.env', 'BASTION_PORT') }}"
+      ansible_ssh_user: "{{ lookup('ansible.builtin.env', 'BASTION_USER') }}"
+      ansible_ssh_pass: "{{ lookup('ansible.builtin.env', 'BASTION_PASSWORD') }}"
+      ansible_python_interpreter: /usr/libexec/platform-python
+    loop:
+      - imrhel
+
 - name: Demo Playbook for the ansible-runner API
   hosts: all:!localhost
   gather_facts: false
@@ -44,11 +54,20 @@
       dest: "/tmp/setup-scripts/setup-{{ ansible_host }}.sh"
     register: r_result
 
+  - name: Include secrets var
+    include_vars: ../config/secrets.yaml
+
   - name: Execute module_stage-host.sh if it exists
     when: r_script_test.stat.exists
-    shell: "sh -x /tmp/setup-scripts/setup-{{ ansible_host }}.sh > /tmp/setup-scripts/setup-{{ ansible_host }}.log 2>&1"
+    shell: "sh /tmp/setup-scripts/setup-{{ ansible_host }}.sh > /tmp/setup-scripts/setup-{{ ansible_host }}.log 2>&1"
     become: true
     register: r_result
+    environment:
+      REGISTRY_PULL_TOKEN: "{{ lookup('ansible.builtin.env', 'REGISTRY_PULL_TOKEN') }}"
+      GUID: "{{ lookup('ansible.builtin.env', 'GUID') }}"
+      DOMAIN: "{{ lookup('ansible.builtin.env', 'DOMAIN') }}"
+      ZEROSSL_EAB_KEY_ID: "{{ zerossl_eab_key_id }}"
+      ZEROSSL_HMAC_KEY: "{{ zerossl_hmac_key }}"
 
   - name: Output script result
     ansible.builtin.debug:
@@ -75,3 +94,10 @@
     - r_result is defined
     - r_result.rc != 0
 
+  - name: Reboot image mode target
+    ansible.builtin.shell: /sbin/shutdown -r now "Reboot requested"
+    async: 1
+    poll: 0
+    ignore_errors: true
+    when: inventory_hostname == "imrhel"
+    become: true

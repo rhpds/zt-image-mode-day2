@@ -17,5 +17,7 @@ antora:
       solveButton: true
 
 tabs:
-  - name: ">_ terminal"
-    url: /wetty
+  - name: ">_ Builder"
+    url: /wetty/ssh/root
+  - name: ">_ Image mode host"
+    url: /wetty_imrhel/ssh/root
