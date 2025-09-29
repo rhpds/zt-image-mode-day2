@@ -27,9 +27,10 @@ If not already shown, select Containerfile in the list on the right side of the 
 ![](../assets/containerfile_scripteditor1.png)
 
 Replace the FROM line with the RHEL 10 bootc base image from the catalog
-````
+
+----
 FROM registry.redhat.io/rhel10/rhel-bootc:10.0
-````
+----
 
 The editor will automatically save changes. Once you see Changes Saved in the upper right, you can return to the [button label="Terminal" background="#ee0000" color="#c7c7c7"](tab-0) tab. You can also use 'Ctrl s' or 'Cmd s' to save depending on your OS.
 
@@ -50,7 +51,7 @@ This means we can catch changes like these at build time since `dnf` would have 
 Once we push the new image to the registry, we can use it immediately on any available image mode host.
 [source,bash,run]
 ----
-podman push [registry-${guid}.${domain}/test-bootc:el10 
+podman push registry-${guid}.${domain}/test-bootc:el10 
 ----
 
 == Connect to the VM running our bootc image
