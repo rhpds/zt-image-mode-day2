@@ -39,7 +39,7 @@ With our changes in the Containerfile saved, we will run `podman build` to get a
 
 [source,bash,run]
 ----
-podman build -t registry-${guid}.${domain}/test-bootc:el10 .
+podman build -t registry-{guid}.{domain}/test-bootc:el10 .
 ----
 
 It's really that simple to build a new image based on a completely different version of RHEL.
@@ -51,7 +51,7 @@ This means we can catch changes like these at build time since `dnf` would have 
 Once we push the new image to the registry, we can use it immediately on any available image mode host.
 [source,bash,run]
 ----
-podman push registry-${guid}.${domain}/test-bootc:el10 
+podman push registry-{guid}.{domain}/test-bootc:el10 
 ----
 
 == Connect to the VM running our bootc image
@@ -95,7 +95,7 @@ confirms that we are getting updates for this image from a registry.
 We can migrate this host to our new RHEL 10 image with `bootc switch`.
 [source,bash,run]
 ----
-sudo bootc switch registry-${guid}.${domain}/test-bootc:el10
+sudo bootc switch registry-{guid}.{domain}/test-bootc:el10
 ----
 
 At first glance, `+bootc switch+` doesn’t look very different from

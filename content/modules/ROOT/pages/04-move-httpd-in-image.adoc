@@ -20,7 +20,7 @@ command is removed after the command exits.
 
 [source,bash,run]
 ----
-podman run --rm registry-${guid}.${domain}/test-bootc:v2 ls /var/www/html
+podman run --rm registry-{guid}.{domain}/test-bootc:v2 ls /var/www/html
 ----
 
 == Image vs host state
@@ -82,7 +82,7 @@ series of updated images.
 
 [source,bash,run]
 ----
-podman build -t registry-${guid}.${domain}/test-bootc::v3 -f Containerfile.index
+podman build -t registry-{guid}.{domain}/test-bootc::v3 -f Containerfile.index
 ----
 
 Let’s test the new image for our new file location the same way we did
@@ -90,7 +90,7 @@ earlier, by running the container locally.
 
 [source,bash,run]
 ----
-podman run --rm registry-${guid}.${domain}/test-bootc::v3 ls /usr/share/www/html
+podman run --rm registry-{guid}.{domain}/test-bootc::v3 ls /usr/share/www/html
 ----
 
 Now that we’re sure we have the changes we need, we can push it to the
@@ -100,7 +100,7 @@ new tag.
 
 [source,bash,run]
 ----
-podman push registry-${guid}.${domain}/test-bootc::v3
+podman push registry-{guid}.{domain}/test-bootc::v3
 ----
 
 == Switch the VM to our newest version
@@ -131,7 +131,7 @@ to the image we just created with the updated Apache config.
 
 [source,bash,run]
 ----
-sudo bootc switch registry-${guid}.${domain}/test-bootc::v3
+sudo bootc switch registry-{guid}.{domain}/test-bootc::v3
 ----
 
 Check that the new image has been staged for the next boot.

@@ -42,7 +42,7 @@ new web page.
 
 [source,bash,run]
 ----
-podman build -t registry-${guid}.${domain}/test-bootc:v2 .
+podman build -t registry-{guid}.{domain}/test-bootc:v2 .
 ----
 
 == Push multiple tagged versions to the registry
@@ -59,7 +59,7 @@ as well.
 
 [source,bash,run]
 ----
-podman image tag registry-${guid}.${domain}/test-bootc:v2 registry-${guid}.${domain}/test-bootc:dev
+podman image tag registry-{guid}.{domain}/test-bootc:v2 registry-{guid}.{domain}/test-bootc:dev
 ----
 
 Look at the different images we’ve created.
@@ -82,12 +82,12 @@ image.
 
 [source,bash,run]
 ----
-podman push registry-${guid}.${domain}/test-bootc:v2
+podman push registry-{guid}.{domain}/test-bootc:v2
 ----
 
 [source,bash,run]
 ----
-podman push registry-${guid}.${domain}/test-bootc:dev
+podman push registry-{guid}.{domain}/test-bootc:dev
 ----
 
 == Switch to the v2 image
@@ -128,7 +128,7 @@ image, you could use either `+v2+` or `+dev+` to install the new image.
 
 [source,bash,run]
 ----
-sudo bootc switch registry-${guid}.${domain}/test-bootc:v2
+sudo bootc switch registry-{guid}.{domain}/test-bootc:v2
 ----
 
 Unlike the first exercise, `+bootc switch+` only pulls down the one
