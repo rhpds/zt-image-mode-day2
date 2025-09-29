@@ -70,7 +70,7 @@ EOF
 
 # create V3 index.html relocated containerfile
 cat <<EOM> ~/Containerfile
-FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
+FROM registry.redhat.io/rhel9/rhel-bootc:9.6
 
 ADD etc /etc
 
@@ -82,8 +82,6 @@ RUN <<EOF
     mv /var/www /usr/share/www
     sed -i 's-/var/www-/usr/share/www-' /etc/httpd/conf/httpd.conf
 EOF
-
-RUN echo "New application coming soon!" > /usr/share/www/html/index.html
 
 EOM
 
