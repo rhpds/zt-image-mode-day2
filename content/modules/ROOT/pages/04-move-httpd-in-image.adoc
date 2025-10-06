@@ -29,7 +29,7 @@ index.html
 
 The file is there, so why didn’t it show up on the host? In
 https://www.redhat.com/en/introduction-to-image-mode-for-red-hat-enterprise-linux-interactive-lab[the
-image mode basics lab], we discussed how `+/etc+` is treated in image
+image mode basics lab,window=_blank], we discussed how `+/etc+` is treated in image
 mode. The `+/var+` hierarchy is also treated specially.
 
 [cols=",,",options="header",]

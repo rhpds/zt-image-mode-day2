@@ -2,7 +2,7 @@ Welcome to this lab experience for Red Hat Enterprise Linux.
 
 In a
 https://www.redhat.com/en/introduction-to-image-mode-for-red-hat-enterprise-linux-interactive-lab[previous
-image mode lab], we created a virtual machine from a bootc image.
+image mode lab,window=_blank], we created a virtual machine from a bootc image.
 Adapting to changes in infrastructure or role is core to how bootc hosts
 operate. We’ll explore how `+bootc+` tracks images, changes host
 purposes, and rolls back changes.
