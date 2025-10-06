@@ -29,7 +29,7 @@ trigger the rollback, we issue one command.
 bootc rollback
 ----
 
-The command should return very fast and the output looks like this:
+Once the rollback is prepared and the bootloader updated, the command should return this:
 
 [source,nocopy]
 ----

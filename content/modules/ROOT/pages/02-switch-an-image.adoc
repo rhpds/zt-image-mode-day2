@@ -17,17 +17,15 @@ an application, then build it with a new tag.
 
 Add the following line at the end of the filei using vim:
 
-[source,dockerfile]
-----
-RUN echo "New application coming soon!" > /var/www/html/index.html
-----
-
 [source,bash,run]
 ----
 vim Containerfile
 ----
 
-image:../assets/containerfile_add_index.png[../assets/containerfile_add_index]
+[source,dockerfile]
+----
+RUN echo "New application coming soon!" > /var/www/html/index.html
+----
 
 
 == Use podman to build the image
@@ -90,15 +88,7 @@ podman push registry-{guid}.{domain}/test-bootc:dev
 
 == Switch to the v2 image
 
-Swith to the `Image mode host` tab to apply the update.
-
-[NOTE]
-====
-If the SSH session hasn’t connected or there is an error,
-you can reconnect by clicking Refresh next to the tab name. The prompt
-will look like this.
-image:../assets/terminal_prompt.png[../assets/terminal_prompt]
-====
+Switch to the `Image mode host` tab to apply the update.
 
 The new images we pushed to the registry didn’t use the `+el10+` tag,
 so they won’t be seen as an update by `+bootc+`. 

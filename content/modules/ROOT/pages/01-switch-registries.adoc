@@ -19,14 +19,14 @@ Let's do something radical to explore changing the starting bootc image. In the 
 
 On the `Builder` tab, replace the FROM line with the RHEL 10 bootc base image from the catalog using vim.
 
-[source,dockerfile]
-----
-FROM registry.redhat.io/rhel10/rhel-bootc:10.0
-----
-
 [source,bash,run,subs=attributes+]
 ----
 vim Containerfile
+----
+
+[source,dockerfile]
+----
+FROM registry.redhat.io/rhel10/rhel-bootc:10.0
 ----
 
 === Use podman to build the image
@@ -59,7 +59,6 @@ Let’s connect to the virtual machine via SSH. Switch to the `Image mode host` 
 If the SSH session hasn’t connected or there is an error,
 you can reconnect by clicking Refresh next to the tab name. The prompt
 will look like this.
-image:../assets/terminal_prompt.png[../assets/terminal_prompt]
 ====
 
 == Check the image the VM is using
