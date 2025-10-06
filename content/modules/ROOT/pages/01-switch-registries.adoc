@@ -20,24 +20,22 @@ Image mode can make testing these sorts of changes much easier, not only by simp
 
 Let's do something radical to explore changing the starting bootc image. In the previous lab, we were using RHEL 9. While we could just use a later minor version, let's see what happens if we use the RHEL 10 bootc base instead.
 
-Click on the [button label="Containerfile" background="#ee0000" color="#c7c7c7"](tab-1) tab.
+Replace the FROM line with the RHEL 10 bootc base image from the catalog using vim.
 
-If not already shown, select Containerfile in the list on the right side of the tab.
-
-![](../assets/containerfile_scripteditor1.png)
-
-Replace the FROM line with the RHEL 10 bootc base image from the catalog
-
+[source,text]
 ----
 FROM registry.redhat.io/rhel10/rhel-bootc:10.0
 ----
 
-The editor will automatically save changes. Once you see Changes Saved in the upper right, you can return to the [button label="Terminal" background="#ee0000" color="#c7c7c7"](tab-0) tab. You can also use 'Ctrl s' or 'Cmd s' to save depending on your OS.
+[source,bash,run,subs=attributes+]
+----
+vim Containerfile
+----
 
 === Use podman to build the image
 With our changes in the Containerfile saved, we will run `podman build` to get a new image. This time we'll add the tag `el10` so we know which version we're using. We'll talk more about tags in a later exercise, but image names and tags are part of how `bootc` knows what image to track for updates.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman build -t registry-{guid}.{domain}/test-bootc:el10 .
 ----
@@ -49,7 +47,8 @@ Keep in mind that we aren't upgrading in the same sense that `leapp` does. We've
 This means we can catch changes like these at build time since `dnf` would have thrown an error trying to install the RHEL 9 package. This helps with the cycle of experimentation when building any new standardized image, not just for major versions.
 
 Once we push the new image to the registry, we can use it immediately on any available image mode host.
-[source,bash,run]
+
+[source,bash,run,subs=attributes+]
 ----
 podman push registry-{guid}.{domain}/test-bootc:el10 
 ----
@@ -64,8 +63,6 @@ you can reconnect by clicking Refresh next to the tab name. The prompt
 will look like this.
 image:../assets/terminal_prompt.png[../assets/terminal_prompt]
 ____
-
-
 
 == Check the image the VM is using
 
@@ -93,7 +90,8 @@ confirms that we are getting updates for this image from a registry.
 == Switch to a new image
 
 We can migrate this host to our new RHEL 10 image with `bootc switch`.
-[source,bash,run]
+
+[source,bash,run,subs=attributes+]
 ----
 sudo bootc switch registry-{guid}.{domain}/test-bootc:el10
 ----
@@ -105,8 +103,10 @@ different based on the metadata available in the registry.
 
 Again, we aren't upgrading the host in the way that `leapp` does, rather we're deploying new system software alongside existing configuration and user data.
 
-> [!NOTE]
-> You may see SELinux errors during the switch that refer to Non-ASCII characters in a binary policy, these are harmless and we're looking at fixes now.
+[NOTE]
+====
+You may see SELinux errors during the switch that refer to Non-ASCII characters in a binary policy, these are harmless and we're looking at fixes now. However, these are the types of things that may vary when doing major version testing like we are in this lab.
+====
 
 We can see in the output of `+bootc switch+` that our new image has been
 queued to be activated the next time the host boots. We can also see if
@@ -128,25 +128,6 @@ sudo reboot
 
 Once the system has completed rebooting, you can log back in by clicking
 the refresh button.
-
-Password:
-
-[source,bash,run]
-----
-redhat
-----
-
-Since update tracking is one of the key features that needs current and
-correct locations, let’s confirm that `+bootc+` is using our new
-registry to check for any updates.
-
-[source,bash,run]
-----
-sudo bootc upgrade --check
-----
-
-
-Once the system has completed rebooting, you can log back in by clicking the refresh button.
 
 You will be greeted with a new default MOTD, and notice your original user and password still work. Local changes to the VM persist even though we've completely changed the system software to RHEL 10. You can check the `redhat-release` file to confirm the VM is running RHEL 10. Feel free to explore in other ways to confirm this is really RHEL 10.
 

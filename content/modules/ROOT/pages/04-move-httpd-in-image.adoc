@@ -1,7 +1,6 @@
 == What happened to our index file?
 
-You can return to the link:tab-0[button label="`Terminal`"
-background="`#ee0000`" color="`#c7c7c7`"] tab to explore what happened
+You can return to the `Terminal` tab to explore what happened
 to the new index.html file
 
 We didn’t see any errors from the `+podman build+` when we created the
@@ -18,7 +17,7 @@ the command we want run to the container as an argument. We’re also
 adding the `+--rm+` flag to make sure the container that runs the `+ls+`
 command is removed after the command exits.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman run --rm registry-{guid}.{domain}/test-bootc:v2 ls /var/www/html
 ----
@@ -45,19 +44,12 @@ time and version it with the image, we’ll need to move it somewhere
 
 == Versioning files with the image
 
-Let’s look at a new Containerfile to see how we can do that.
+Let’s look at a new Containerfile to see how we can do that. Look at the new `+RUN+` command that uses the `+heredoc+` format to wrap several lines.
 
-Click on the link:tab-1[button label="`Containerfile`"
-background="`#ee0000`" color="`#c7c7c7`"] tab.
-
-Select Containerfile.index from the list on the right side of the tab.
-
-image:../assets/containerfile_scripteditor2.png[../assets/containerfile_scripteditor2]
-
-Look at the new `+RUN+` command that uses the `+heredoc+` format to wrap
-several lines.
-
-image:../assets/containerfile_heredoc_index.png[../assets/containerfile_heredoc_index]
+[source,bash,run]
+----
+cat Containerfile.index
+----
 
 The first command in this block will move the directories and files
 installed by Apache to a new directory under `+/usr+`. The second will
@@ -69,10 +61,6 @@ Since we haven’t made any changes on our bootc host to this file in
 local changes to the httpd config, you may need to create a drop-in file
 or use some other means to update the Apache config.
 
-Once you feel you understand the change, you can return to the
-link:tab-0[button label="`Terminal`" background="`#ee0000`"
-color="`#c7c7c7`"] tab
-
 == Use podman to build the image.
 
 We can pass this new file to the `+podman build+` command with the
@@ -80,7 +68,7 @@ We can pass this new file to the `+podman build+` command with the
 versioning semantics can help folks understand what’s current in a
 series of updated images.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman build -t registry-{guid}.{domain}/test-bootc::v3 -f Containerfile.index
 ----
@@ -88,7 +76,7 @@ podman build -t registry-{guid}.{domain}/test-bootc::v3 -f Containerfile.index
 Let’s test the new image for our new file location the same way we did
 earlier, by running the container locally.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman run --rm registry-{guid}.{domain}/test-bootc::v3 ls /usr/share/www/html
 ----
@@ -98,38 +86,19 @@ registry. Once again, note how only the changed layers need to be added
 to the registry even though we changed directory contents and created a
 new tag.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman push registry-{guid}.{domain}/test-bootc::v3
 ----
 
 == Switch the VM to our newest version
 
-To update the VM, return to the the VM by clicking on the
-link:tab-2[button label="`VM SSH session`" background="`#ee0000`"
-color="`#c7c7c7`"] tab.
-
-____
-[!NOTE] If the session hasn’t connected or there is an error, you can
-reconnect by clicking Refresh next to the tab name. The prompt will look
-like this.
-image:../assets/terminal_prompt.png[../assets/terminal_prompt] If you
-are already logged in, you may not have rebooted after the rollback.
-____
-
-Log in with the following credentials:
-
-Password:
-
-[source,bash,run]
-----
-redhat
-----
+To apply this update, return to the the VM tab.
 
 Just like in the other exercises, we can use `+bootc switch+` to change
 to the image we just created with the updated Apache config.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 sudo bootc switch registry-{guid}.{domain}/test-bootc::v3
 ----

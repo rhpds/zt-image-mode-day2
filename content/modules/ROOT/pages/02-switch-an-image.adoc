@@ -7,7 +7,6 @@ As a review, the naming convention for container images is `registry/name:tag`. 
 podman images
 ----
 
-
 In the previous exercise, we used the `el10` tag when building the new RHEL 10 version of the image. You'll also see other images have version information in the TAG column. However, in other labs we didn't set an explicit tag, which means `podman` will use the default `latest` tag. While this is convenient, it can create a lot of confusion. What is in that `latest` container? Which updates did we provide? Have you seen the `latest` tag in any of the `bootc status` output so far?
 
 == Using tags for identifying image contents
@@ -15,19 +14,17 @@ In the previous exercise, we used the `el10` tag when building the new RHEL 10 v
 Let’s add some new content to our webserver in preparation for deploying
 an application, then build it with a new tag.
 
-Click on the link:tab-1[button label="`Containerfile`"
-background="`#ee0000`" color="`#c7c7c7`"] tab.
+Add the following line at the end of the filei using vim:
 
-If not already shown, select Containerfile in the list on the right side
-of the tab.
-
-image:../assets/containerfile_scripteditor1.png[../assets/containerfile_scripteditor1]
-
-Add the following line at the end of the file:
-
-....
+[source,text]
+----
 RUN echo "New application coming soon!" > /var/www/html/index.html
-....
+----
+
+[source,bash,run]
+----
+vim Containerfile
+----
 
 image:../assets/containerfile_add_index.png[../assets/containerfile_add_index]
 
@@ -40,7 +37,7 @@ tag by adding `+v2+` to the end of the container name. The container
 tools once again reuse the pre-existing layers, only adding one for our
 new web page.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman build -t registry-{guid}.{domain}/test-bootc:v2 .
 ----
@@ -57,7 +54,7 @@ development environment and not for production use. We could add a
 This tag is only applied locally, so we need push that to the registry
 as well.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman image tag registry-{guid}.{domain}/test-bootc:v2 registry-{guid}.{domain}/test-bootc:dev
 ----
@@ -80,12 +77,12 @@ available for use. Notice that the `+dev+` tagged image only copies a
 config layer since all of the other layers are identical to the `+v2+`
 image.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman push registry-{guid}.{domain}/test-bootc:v2
 ----
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 podman push registry-{guid}.{domain}/test-bootc:dev
 ----
@@ -95,21 +92,13 @@ podman push registry-{guid}.{domain}/test-bootc:dev
 Click on the link:tab-2[button label="`VM SSH session`"
 background="`#ee0000`" color="`#c7c7c7`"] tab.
 
-____
-{empty}[!NOTE] If the SSH session hasn’t connected or there is an error,
+[NOTE]
+====
+If the SSH session hasn’t connected or there is an error,
 you can reconnect by clicking Refresh next to the tab name. The prompt
 will look like this.
 image:../assets/terminal_prompt.png[../assets/terminal_prompt]
-____
-
-You can use the following credentials to log in.
-
-Password:
-
-[source,bash,run]
-----
-redhat
-----
+====
 
 The new images we pushed to the registry didn’t use the `+latest+` tag,
 so they won’t be seen as an update by `+bootc+`. Notice there’s nothing
@@ -126,7 +115,7 @@ different image than what `+bootc+` is tracking. We can use
 change repositories. And since there are two tags that refer to the same
 image, you could use either `+v2+` or `+dev+` to install the new image.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
 sudo bootc switch registry-{guid}.{domain}/test-bootc:v2
 ----
@@ -152,13 +141,6 @@ sudo reboot
 
 Once the system has completed rebooting, you can log back in by clicking
 the refresh button.
-
-Password:
-
-[source,bash,run]
-----
-redhat
-----
 
 Let’s check what the `+spec+` section of `+bootc status+` now says about
 where we’re looking for updates.
