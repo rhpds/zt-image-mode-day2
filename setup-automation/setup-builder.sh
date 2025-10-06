@@ -90,6 +90,8 @@ RUN dnf install -y httpd vim
 
 RUN systemctl enable httpd
 
+RUN echo "New application coming soon!" > /var/www/html/index.html
+
 RUN <<EOF 
     mv /var/www /usr/share/www
     sed -i 's-/var/www-/usr/share/www-' /etc/httpd/conf/httpd.conf

@@ -1,4 +1,5 @@
 == A word about tags
+Return to the `Builder` tab for this exercise.
 
 As a review, the naming convention for container images is `registry/name:tag`. Let's examine the different images that are currently on this host.
 
@@ -16,7 +17,7 @@ an application, then build it with a new tag.
 
 Add the following line at the end of the filei using vim:
 
-[source,text]
+[source,dockerfile]
 ----
 RUN echo "New application coming soon!" > /var/www/html/index.html
 ----
@@ -89,8 +90,7 @@ podman push registry-{guid}.{domain}/test-bootc:dev
 
 == Switch to the v2 image
 
-Click on the link:tab-2[button label="`VM SSH session`"
-background="`#ee0000`" color="`#c7c7c7`"] tab.
+Swith to the `Image mode host` tab to apply the update.
 
 [NOTE]
 ====
@@ -100,13 +100,12 @@ will look like this.
 image:../assets/terminal_prompt.png[../assets/terminal_prompt]
 ====
 
-The new images we pushed to the registry didn’t use the `+latest+` tag,
-so they won’t be seen as an update by `+bootc+`. Notice there’s nothing
-after the name `+test-bootc+` in the output.
+The new images we pushed to the registry didn’t use the `+el10+` tag,
+so they won’t be seen as an update by `+bootc+`. 
 
 [source,bash,run]
 ----
-sudo bootc upgrade --check
+bootc upgrade --check
 ----
 
 Since tags are part of the image name, our new `+v2+` image is a
@@ -117,7 +116,7 @@ image, you could use either `+v2+` or `+dev+` to install the new image.
 
 [source,bash,run,subs=attributes+]
 ----
-sudo bootc switch registry-{guid}.{domain}/test-bootc:v2
+bootc switch registry-{guid}.{domain}/test-bootc:v2
 ----
 
 Unlike the first exercise, `+bootc switch+` only pulls down the one
@@ -134,7 +133,7 @@ We need to restart the system to apply our changes.
 
 [source,bash,run]
 ----
-sudo reboot
+reboot
 ----
 
 == Check the VM is running the v2 image
@@ -147,7 +146,7 @@ where we’re looking for updates.
 
 [source,bash,run]
 ----
-sudo bootc status | grep spec: -A 4
+bootc status | grep spec: -A 4
 ----
 
 There’s the `+v2+` tag, so what about our new placeholder index page?

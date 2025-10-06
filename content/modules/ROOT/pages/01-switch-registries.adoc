@@ -1,8 +1,5 @@
 Welcome to this lab experience for Red Hat Enterprise Linux.
 
-The system displayed beside this text is a Red Hat Enterprise Linux 9
-system registered with Subscription Manager.
-
 In a
 https://www.redhat.com/en/introduction-to-image-mode-for-red-hat-enterprise-linux-interactive-lab[previous
 image mode lab], we created a virtual machine from a bootc image.
@@ -20,9 +17,9 @@ Image mode can make testing these sorts of changes much easier, not only by simp
 
 Let's do something radical to explore changing the starting bootc image. In the previous lab, we were using RHEL 9. While we could just use a later minor version, let's see what happens if we use the RHEL 10 bootc base instead.
 
-Replace the FROM line with the RHEL 10 bootc base image from the catalog using vim.
+On the `Builder` tab, replace the FROM line with the RHEL 10 bootc base image from the catalog using vim.
 
-[source,text]
+[source,dockerfile]
 ----
 FROM registry.redhat.io/rhel10/rhel-bootc:10.0
 ----
@@ -55,32 +52,25 @@ podman push registry-{guid}.{domain}/test-bootc:el10
 
 == Connect to the VM running our bootc image
 
-Let’s connect to the virtual machine via SSH. Switch to the VM SSH session tab.
+Let’s connect to the virtual machine via SSH. Switch to the `Image mode host` tab.
 
-____
-{empty}[!NOTE] If the SSH session hasn’t connected or there is an error,
+[NOTE]
+====
+If the SSH session hasn’t connected or there is an error,
 you can reconnect by clicking Refresh next to the tab name. The prompt
 will look like this.
 image:../assets/terminal_prompt.png[../assets/terminal_prompt]
-____
+====
 
 == Check the image the VM is using
 
 Hosts created from bootc images track a particular image in a specific
-registry. This is how `+bootc+` knows when an update is available. When
-`+bootc+` tries to look for an update, you get a `+no such host+` error.
-
-[source,bash,run]
-----
-sudo bootc upgrade --check
-----
-
-The spec section of bootc status provides the information about the
+registry. The spec section of bootc status provides the information about the
 image in use and where `+bootc+` is looking for it.
 
 [source,bash,run]
 ----
-sudo bootc status | grep spec: -A 4
+bootc status | grep spec: -A 4
 ----
 
 In the output you can see the hostname (and port if needed) as well as
@@ -93,8 +83,12 @@ We can migrate this host to our new RHEL 10 image with `bootc switch`.
 
 [source,bash,run,subs=attributes+]
 ----
-sudo bootc switch registry-{guid}.{domain}/test-bootc:el10
+bootc switch registry-{guid}.{domain}/test-bootc:el10
 ----
+[NOTE]
+====
+If something went wrong with the push step, you may get an error about an unknown manifest. If so, return to the `Builder` tab and double check that the push to the lab registry was succesful.
+====
 
 At first glance, `+bootc switch+` doesn’t look very different from
 `+bootc upgrade+`. It will download and prepare the new image to a local
@@ -114,7 +108,7 @@ there are any changes waiting by checking `+bootc status+`.
 
 [source,bash,run]
 ----
-sudo bootc status
+bootc status
 ----
 
 If we needed to wait for a maintenance window we could stage the
@@ -123,7 +117,7 @@ our changes.
 
 [source,bash,run]
 ----
-sudo reboot
+reboot
 ----
 
 Once the system has completed rebooting, you can log back in by clicking
@@ -140,7 +134,7 @@ You will also see the previous RHEL 9 image is still on disk as a roll back opti
 
 [source,bash,run]
 ----
-sudo bootc status
+bootc status
 ----
 
 Once a host it running, changing the image in use is very straightforward, and can be useful for a number of reasons beyond radical changes like major versions. We'll stick with RHEL 10 from here, but let's explore a little more of what `bootc switch` can do for us in the next few exercises.

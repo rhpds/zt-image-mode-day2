@@ -1,6 +1,6 @@
 == What happened to our index file?
 
-You can return to the `Terminal` tab to explore what happened
+You can return to the `Builder` tab to explore what happened
 to the new index.html file
 
 We didn’t see any errors from the `+podman build+` when we created the
@@ -21,6 +21,9 @@ command is removed after the command exits.
 ----
 podman run --rm registry-{guid}.{domain}/test-bootc:v2 ls /var/www/html
 ----
+....
+index.html
+....
 
 == Image vs host state
 
@@ -50,11 +53,34 @@ Let’s look at a new Containerfile to see how we can do that. Look at the new `
 ----
 cat Containerfile.index
 ----
+[source,dockerfile,nocopy]
+----
+FROM registry.redhat.io/rhel10/rhel-bootc:10.0 
+
+ADD etc /etc 
+
+RUN dnf install -y httpd 
+RUN systemctl enable httpd
+
+RUN echo "New application coming soon!" > /var/www/html/index.html
+
+RUN <<EOF # <1>
+    mv /var/www /usr/share/www # <2>
+    sed -i 's-/var/www-/usr/share/www-' /etc/httpd/conf/httpd.conf
+EOF
+----
+<1> The `heredoc` section using `EOF` as the delimiter
+<2> The commands to be exectued by the `RUN` directive
+
+Outside of a lab, you'd likely put the `echo` command that 
+creates our `index.html` file inside the `heredoc` instead of including as
+a separate layer.  The `heredoc` results in a single layer and is an alternative
+to combining shell commands with the `&` operator.
 
 The first command in this block will move the directories and files
 installed by Apache to a new directory under `+/usr+`. The second will
 update the htttpd config file to change the default document root to our
-new directory.
+new directory. 
 
 Since we haven’t made any changes on our bootc host to this file in
 `+/etc+`, this change will be applied by `+bootc+`. If you had made
@@ -70,7 +96,7 @@ series of updated images.
 
 [source,bash,run,subs=attributes+]
 ----
-podman build -t registry-{guid}.{domain}/test-bootc::v3 -f Containerfile.index
+podman build -t registry-{guid}.{domain}/test-bootc:v3 -f Containerfile.index
 ----
 
 Let’s test the new image for our new file location the same way we did
@@ -78,7 +104,7 @@ earlier, by running the container locally.
 
 [source,bash,run,subs=attributes+]
 ----
-podman run --rm registry-{guid}.{domain}/test-bootc::v3 ls /usr/share/www/html
+podman run --rm registry-{guid}.{domain}/test-bootc:v3 ls /usr/share/www/html
 ----
 
 Now that we’re sure we have the changes we need, we can push it to the
@@ -88,26 +114,26 @@ new tag.
 
 [source,bash,run,subs=attributes+]
 ----
-podman push registry-{guid}.{domain}/test-bootc::v3
+podman push registry-{guid}.{domain}/test-bootc:v3
 ----
 
 == Switch the VM to our newest version
 
-To apply this update, return to the the VM tab.
+To apply this update, return to the the `Image mode host` tab.
 
 Just like in the other exercises, we can use `+bootc switch+` to change
 to the image we just created with the updated Apache config.
 
 [source,bash,run,subs=attributes+]
 ----
-sudo bootc switch registry-{guid}.{domain}/test-bootc::v3
+bootc switch registry-{guid}.{domain}/test-bootc:v3
 ----
 
 Check that the new image has been staged for the next boot.
 
 [source,bash,run]
 ----
-sudo bootc status
+bootc status
 ----
 
 You can also check the boot order in the spec block to see what has been
@@ -115,14 +141,14 @@ sent to the bootloader. Notice it’s back to `+default+`.
 
 [source,bash,run]
 ----
-sudo bootc status | grep Order
+bootc status | grep Order
 ----
 
 Let’s go ahead and restart the system one last time to get our changes.
 
 [source,bash,run]
 ----
-sudo reboot
+reboot
 ----
 
 Once the system has completed rebooting, you can log back in by clicking `reconnect` or the Refresh button next to the tab name.
