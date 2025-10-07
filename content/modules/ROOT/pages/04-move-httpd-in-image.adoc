@@ -1,7 +1,6 @@
 == What happened to our index file?
 
-You can return to the link:tab-0[button label="`Terminal`"
-background="`#ee0000`" color="`#c7c7c7`"] tab to explore what happened
+You can return to the `Builder` tab to explore what happened
 to the new index.html file
 
 We didn’t see any errors from the `+podman build+` when we created the
@@ -18,16 +17,19 @@ the command we want run to the container as an argument. We’re also
 adding the `+--rm+` flag to make sure the container that runs the `+ls+`
 command is removed after the command exits.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman run --rm [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v2 ls /var/www/html
+podman run --rm registry-{guid}.{domain}/test-bootc:v2 ls /var/www/html
 ----
+....
+index.html
+....
 
 == Image vs host state
 
 The file is there, so why didn’t it show up on the host? In
 https://www.redhat.com/en/introduction-to-image-mode-for-red-hat-enterprise-linux-interactive-lab[the
-image mode basics lab], we discussed how `+/etc+` is treated in image
+image mode basics lab,window=_blank], we discussed how `+/etc+` is treated in image
 mode. The `+/var+` hierarchy is also treated specially.
 
 [cols=",,",options="header",]
@@ -45,33 +47,45 @@ time and version it with the image, we’ll need to move it somewhere
 
 == Versioning files with the image
 
-Let’s look at a new Containerfile to see how we can do that.
+Let’s look at a new Containerfile to see how we can do that. Look at the new `+RUN+` command that uses the `+heredoc+` format to wrap several lines.
 
-Click on the link:tab-1[button label="`Containerfile`"
-background="`#ee0000`" color="`#c7c7c7`"] tab.
+[source,bash,run]
+----
+cat Containerfile.index
+----
+[source,dockerfile,nocopy]
+----
+FROM registry.redhat.io/rhel10/rhel-bootc:10.0 
 
-Select Containerfile.index from the list on the right side of the tab.
+ADD etc /etc 
 
-image:../assets/containerfile_scripteditor2.png[../assets/containerfile_scripteditor2]
+RUN dnf install -y httpd 
+RUN systemctl enable httpd
 
-Look at the new `+RUN+` command that uses the `+heredoc+` format to wrap
-several lines.
+RUN echo "New application coming soon!" > /var/www/html/index.html
 
-image:../assets/containerfile_heredoc_index.png[../assets/containerfile_heredoc_index]
+RUN <<EOF # <1>
+    mv /var/www /usr/share/www # <2>
+    sed -i 's-/var/www-/usr/share/www-' /etc/httpd/conf/httpd.conf
+EOF
+----
+<1> The `heredoc` section using `EOF` as the delimiter
+<2> The commands to be exectued by the `RUN` directive
+
+Outside of a lab, you'd likely put the `echo` command that 
+creates our `index.html` file inside the `heredoc` instead of including as
+a separate layer.  The `heredoc` results in a single layer and is an alternative
+to combining shell commands with the `&` operator.
 
 The first command in this block will move the directories and files
 installed by Apache to a new directory under `+/usr+`. The second will
 update the htttpd config file to change the default document root to our
-new directory.
+new directory. 
 
 Since we haven’t made any changes on our bootc host to this file in
 `+/etc+`, this change will be applied by `+bootc+`. If you had made
 local changes to the httpd config, you may need to create a drop-in file
 or use some other means to update the Apache config.
-
-Once you feel you understand the change, you can return to the
-link:tab-0[button label="`Terminal`" background="`#ee0000`"
-color="`#c7c7c7`"] tab
 
 == Use podman to build the image.
 
@@ -80,17 +94,17 @@ We can pass this new file to the `+podman build+` command with the
 versioning semantics can help folks understand what’s current in a
 series of updated images.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman build -t [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v3 -f Containerfile.index
+podman build -t registry-{guid}.{domain}/test-bootc:v3 -f Containerfile.index
 ----
 
 Let’s test the new image for our new file location the same way we did
 earlier, by running the container locally.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman run --rm [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v3 ls /usr/share/www/html
+podman run --rm registry-{guid}.{domain}/test-bootc:v3 ls /usr/share/www/html
 ----
 
 Now that we’re sure we have the changes we need, we can push it to the
@@ -98,47 +112,28 @@ registry. Once again, note how only the changed layers need to be added
 to the registry even though we changed directory contents and created a
 new tag.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman push [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v3
+podman push registry-{guid}.{domain}/test-bootc:v3
 ----
 
 == Switch the VM to our newest version
 
-To update the VM, return to the the VM by clicking on the
-link:tab-2[button label="`VM SSH session`" background="`#ee0000`"
-color="`#c7c7c7`"] tab.
-
-____
-[!NOTE] If the session hasn’t connected or there is an error, you can
-reconnect by clicking Refresh next to the tab name. The prompt will look
-like this.
-image:../assets/terminal_prompt.png[../assets/terminal_prompt] If you
-are already logged in, you may not have rebooted after the rollback.
-____
-
-Log in with the following credentials:
-
-Password:
-
-[source,bash,run]
-----
-redhat
-----
+To apply this update, return to the the `Image mode host` tab.
 
 Just like in the other exercises, we can use `+bootc switch+` to change
 to the image we just created with the updated Apache config.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-sudo bootc switch [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v3
+bootc switch registry-{guid}.{domain}/test-bootc:v3
 ----
 
 Check that the new image has been staged for the next boot.
 
 [source,bash,run]
 ----
-sudo bootc status
+bootc status
 ----
 
 You can also check the boot order in the spec block to see what has been
@@ -146,24 +141,17 @@ sent to the bootloader. Notice it’s back to `+default+`.
 
 [source,bash,run]
 ----
-sudo bootc status | grep Order
+bootc status | grep Order
 ----
 
 Let’s go ahead and restart the system one last time to get our changes.
 
 [source,bash,run]
 ----
-sudo reboot
+reboot
 ----
 
-Once the system has completed rebooting, you can log back in.
-
-Password:
-
-[source,bash,run]
-----
-redhat
-----
+Once the system has completed rebooting, you can log back in by clicking `reconnect` or the Refresh button next to the tab name.
 
 What about our new placeholder index page?
 

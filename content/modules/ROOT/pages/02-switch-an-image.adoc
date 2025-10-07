@@ -1,48 +1,32 @@
 == A word about tags
+Return to the `Builder` tab for this exercise.
 
-To this point, we’ve been letting podman automatically create tags for
-the images we’ve built. As a review, the naming convention for container
-images is `+registry/name:tag+`.
-
-If you look at all of the images available in the lab, you’ll see most
-of them have a version number in the tag column. The image we’ve built
-is the only one that uses `+latest+`, which signals the most recent
-build and is auto-generated if you don’t specify a tag.
+As a review, the naming convention for container images is `registry/name:tag`. Let's examine the different images that are currently on this host.
 
 [source,bash,run]
 ----
 podman images
 ----
 
-While this is convenient, it can create a lot of confusion. What is in
-that `+latest+` container? Which updates did we provide? Have you seen
-the `+latest+` tag in any of the `+bootc status+` output so far?
+In the previous exercise, we used the `el10` tag when building the new RHEL 10 version of the image. You'll also see other images have version information in the TAG column. However, in other labs we didn't set an explicit tag, which means `podman` will use the default `latest` tag. While this is convenient, it can create a lot of confusion. What is in that `latest` container? Which updates did we provide? Have you seen the `latest` tag in any of the `bootc status` output so far?
 
 == Using tags for identifying image contents
 
 Let’s add some new content to our webserver in preparation for deploying
 an application, then build it with a new tag.
 
-Click on the link:tab-1[button label="`Containerfile`"
-background="`#ee0000`" color="`#c7c7c7`"] tab.
+Add the following line at the end of the filei using vim:
 
-If not already shown, select Containerfile in the list on the right side
-of the tab.
+[source,bash,run]
+----
+vim Containerfile
+----
 
-image:../assets/containerfile_scripteditor1.png[../assets/containerfile_scripteditor1]
-
-Add the following line at the end of the file:
-
-....
+[source,dockerfile]
+----
 RUN echo "New application coming soon!" > /var/www/html/index.html
-....
+----
 
-image:../assets/containerfile_add_index.png[../assets/containerfile_add_index]
-
-The editor will automatically save changes. Once you see Changes Saved
-in the upper right, you can return to the link:tab-0[button
-label="`Terminal`" background="`#ee0000`" color="`#c7c7c7`"] tab. You
-can also use '`Ctrl s`' or '`Cmd s`' to save depending on your OS.
 
 == Use podman to build the image
 
@@ -52,9 +36,9 @@ tag by adding `+v2+` to the end of the container name. The container
 tools once again reuse the pre-existing layers, only adding one for our
 new web page.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman build -t [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v2 .
+podman build -t registry-{guid}.{domain}/test-bootc:v2 .
 ----
 
 == Push multiple tagged versions to the registry
@@ -69,9 +53,9 @@ development environment and not for production use. We could add a
 This tag is only applied locally, so we need push that to the registry
 as well.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman image tag [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v2 [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:dev
+podman image tag registry-{guid}.{domain}/test-bootc:v2 registry-{guid}.{domain}/test-bootc:dev
 ----
 
 Look at the different images we’ve created.
@@ -92,44 +76,26 @@ available for use. Notice that the `+dev+` tagged image only copies a
 config layer since all of the other layers are identical to the `+v2+`
 image.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman push [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v2
+podman push registry-{guid}.{domain}/test-bootc:v2
 ----
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-podman push [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:dev
+podman push registry-{guid}.{domain}/test-bootc:dev
 ----
 
 == Switch to the v2 image
 
-Click on the link:tab-2[button label="`VM SSH session`"
-background="`#ee0000`" color="`#c7c7c7`"] tab.
+Switch to the `Image mode host` tab to apply the update.
 
-____
-{empty}[!NOTE] If the SSH session hasn’t connected or there is an error,
-you can reconnect by clicking Refresh next to the tab name. The prompt
-will look like this.
-image:../assets/terminal_prompt.png[../assets/terminal_prompt]
-____
-
-You can use the following credentials to log in.
-
-Password:
+The new images we pushed to the registry didn’t use the `+el10+` tag,
+so they won’t be seen as an update by `+bootc+`. 
 
 [source,bash,run]
 ----
-redhat
-----
-
-The new images we pushed to the registry didn’t use the `+latest+` tag,
-so they won’t be seen as an update by `+bootc+`. Notice there’s nothing
-after the name `+test-bootc+` in the output.
-
-[source,bash,run]
-----
-sudo bootc upgrade --check
+bootc upgrade --check
 ----
 
 Since tags are part of the image name, our new `+v2+` image is a
@@ -138,9 +104,9 @@ different image than what `+bootc+` is tracking. We can use
 change repositories. And since there are two tags that refer to the same
 image, you could use either `+v2+` or `+dev+` to install the new image.
 
-[source,bash,run]
+[source,bash,run,subs=attributes+]
 ----
-sudo bootc switch [[ Instruqt-Var key="CONTAINER_REGISTRY_ENDPOINT" hostname="rhel" ]]/test-bootc:v2
+bootc switch registry-{guid}.{domain}/test-bootc:v2
 ----
 
 Unlike the first exercise, `+bootc switch+` only pulls down the one
@@ -157,7 +123,7 @@ We need to restart the system to apply our changes.
 
 [source,bash,run]
 ----
-sudo reboot
+reboot
 ----
 
 == Check the VM is running the v2 image
@@ -165,19 +131,12 @@ sudo reboot
 Once the system has completed rebooting, you can log back in by clicking
 the refresh button.
 
-Password:
-
-[source,bash,run]
-----
-redhat
-----
-
 Let’s check what the `+spec+` section of `+bootc status+` now says about
 where we’re looking for updates.
 
 [source,bash,run]
 ----
-sudo bootc status | grep spec: -A 4
+bootc status | grep spec: -A 4
 ----
 
 There’s the `+v2+` tag, so what about our new placeholder index page?

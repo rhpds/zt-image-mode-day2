@@ -70,6 +70,18 @@ EOF
 
 # create V3 index.html relocated containerfile
 cat <<EOM> ~/Containerfile
+FROM registry.redhat.io/rhel9/rhel-bootc:9.6
+
+ADD etc /etc
+
+RUN dnf install -y httpd vim
+
+RUN systemctl enable httpd
+EOM
+
+
+# create V3 index.html relocated containerfile
+cat <<EOM> ~/Containerfile.index
 FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
 
 ADD etc /etc
@@ -78,12 +90,12 @@ RUN dnf install -y httpd vim
 
 RUN systemctl enable httpd
 
+RUN echo "New application coming soon!" > /var/www/html/index.html
+
 RUN <<EOF 
     mv /var/www /usr/share/www
     sed -i 's-/var/www-/usr/share/www-' /etc/httpd/conf/httpd.conf
 EOF
-
-RUN echo "New application coming soon!" > /usr/share/www/html/index.html
 
 EOM
 
