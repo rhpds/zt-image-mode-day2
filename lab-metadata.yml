@@ -1,0 +1,52 @@
+# lab-metadata.yml
+# Single Point of Truth for Lab Information
+
+lab:
+  name: "Day 2 operations with image mode for Red Hat Enterprise Linux"
+  shortname: "zt-image-mode-day2"
+  maintainer: "Wilson Harris (wharris@redhat.com)" 
+  
+  description:
+    summary: "In this lab you will manage the on-going operations of an image mode VM."
+    goal: "You'll explore tracking tags for updates, rolling back software changes, and changing the role of a host.
+    You will also update the software available to the VM."
+    concepts:
+      - "Software updates"
+      - "Image mode rollback"
+      - "Image tagging"
+    use_case: "Get familliar with the new image mode for RHEL operating model"
+    time_to_complete: "25" # time in minutes
+    
+  # Git references for deployment
+  git_ref:
+    production: "prod"
+    development: "dev"
+
+# DYNAMIC EXTRACTION SOURCES:
+# ===========================
+#
+# GENERATED FILES:
+# description.adoc: Generated from lab.description (goal, concepts, use_case)
+# README.md: Generated from configuration extraction (maintainer, summary, instances, networks, firewall)
+# dev.yaml: Generated using git_ref.development
+# prod.yaml: Generated using git_ref.production
+#
+# Example usage:
+# lab:
+#   name: "Red Hat OpenShift Networking Basics"
+#   shortname: "zt-networking-basics"
+#   
+#   description:
+#     summary: "Learn the fundamentals of networking in Red Hat OpenShift"
+#     goal: "Understand OpenShift networking concepts and configuration"
+#     concepts:
+#       - "OpenShift Services"
+#       - "Routes and Ingress"
+#       - "Network Policies"
+#     use_case: "Configure secure networking for containerized applications"
+#   
+#   git_ref:
+#     production: "prod"
+#     development: "dev"
+#
+#   maintainer: "Wilson Harris (wharris@redhat.com)"
