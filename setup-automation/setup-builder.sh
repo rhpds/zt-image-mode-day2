@@ -103,3 +103,5 @@ EOM
 echo "10.0.2.2 builder-${GUID}.${DOMAIN}" >> /etc/hosts
 echo "10.0.2.2 registry-${GUID}.${DOMAIN}" >> /etc/hosts
 
+# Fix registry.redhat.io pull token leak
+rm ~/.config/containers/auth.json
