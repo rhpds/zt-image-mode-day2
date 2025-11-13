@@ -15,7 +15,7 @@ cat<<EOF> ~/.config/containers/auth.json
 EOF
 
 # Log into terms based registry and stage bootc and bib images
-BOOTC_RHEL_VER=10.0
+BOOTC_RHEL_VER=10.1
 podman pull registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER registry.redhat.io/rhel10/bootc-image-builder:$BOOTC_RHEL_VER
 
 # set up SSL for fully functioning registry
