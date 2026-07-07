@@ -70,16 +70,16 @@ RUN <<EOF # <1>
 EOF
 ----
 <1> The `heredoc` section using `EOF` as the delimiter
-<2> The commands to be exectued by the `RUN` directive
+<2> The commands to be executed by the `RUN` directive
 
 Outside of a lab, you'd likely put the `echo` command that 
-creates our `index.html` file inside the `heredoc` instead of including as
+creates our `index.html` file inside the `heredoc` instead of including it as
 a separate layer.  The `heredoc` results in a single layer and is an alternative
 to combining shell commands with the `&` operator.
 
 The first command in this block will move the directories and files
 installed by Apache to a new directory under `+/usr+`. The second will
-update the htttpd config file to change the default document root to our
+update the httpd config file to change the default document root to our
 new directory. 
 
 Since we haven’t made any changes on our bootc host to this file in
@@ -119,7 +119,7 @@ podman push registry-{guid}.{domain}/test-bootc:v3
 
 == Switch the VM to our newest version
 
-To apply this update, return to the the `Image mode host` tab.
+To apply this update, return to the `Image mode host` tab.
 
 Just like in the other exercises, we can use `+bootc switch+` to change
 to the image we just created with the updated Apache config.

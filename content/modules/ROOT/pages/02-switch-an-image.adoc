@@ -15,7 +15,7 @@ In the previous exercise, we used the `el10` tag when building the new RHEL 10 v
 Let’s add some new content to our webserver in preparation for deploying
 an application, then build it with a new tag.
 
-Add the following line at the end of the filei using vim:
+Add the following line at the end of the file using vim:
 
 [source,bash,run]
 ----

@@ -86,7 +86,7 @@ bootc switch registry-{guid}.{domain}/test-bootc:el10
 ----
 [NOTE]
 ====
-If something went wrong with the push step, you may get an error about an unknown manifest. If so, return to the `Builder` tab and double check that the push to the lab registry was succesful.
+If something went wrong with the push step, you may get an error about an unknown manifest. If so, return to the `Builder` tab and double check that the push to the lab registry was successful.
 ====
 
 At first glance, `+bootc switch+` doesn’t look very different from
@@ -136,4 +136,4 @@ You will also see the previous RHEL 9 image is still on disk as a roll back opti
 bootc status
 ----
 
-Once a host it running, changing the image in use is very straightforward, and can be useful for a number of reasons beyond radical changes like major versions. We'll stick with RHEL 10 from here, but let's explore a little more of what `bootc switch` can do for us in the next few exercises.
+Once a host is running, changing the image in use is very straightforward, and can be useful for a number of reasons beyond radical changes like major versions. We'll stick with RHEL 10 from here, but let's explore a little more of what `bootc switch` can do for us in the next few exercises.
