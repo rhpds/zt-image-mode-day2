@@ -55,7 +55,8 @@ podman push registry-{guid}.{domain}/test-bootc:el10
 == Connect to the VM running our bootc image
 
 Let’s connect to the virtual machine via SSH. 
-=== _Switch to the `Image mode host` tab._
+
+==== _Switch to the `Image mode host` tab._
 
 [NOTE]
 ====
