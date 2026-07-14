@@ -1,5 +1,5 @@
 == A word about tags
-Return to the `Builder` tab for this exercise.
+=== _Return to the `Builder` tab for this exercise._
 
 As a review, the naming convention for container images is `registry/name:tag`. Let's examine the different images that are currently on this host.
 
@@ -88,7 +88,7 @@ podman push registry-{guid}.{domain}/test-bootc:dev
 
 == Switch to the v2 image
 
-Switch to the `Image mode host` tab to apply the update.
+=== _Switch to the `Image mode host` tab to apply the update._
 
 The new images we pushed to the registry didn’t use the `+el10+` tag,
 so they won’t be seen as an update by `+bootc+`. 
