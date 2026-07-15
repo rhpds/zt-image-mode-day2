@@ -1,6 +1,14 @@
 #!/bin/bash
 set -x 
 
+# Unregister and re-register the VM
+dnf -y remove katello-ca-consumer-*
+subscription-manager clean
+subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --force
+
+# Install required packages
+dnf install -y podman skopeo
+
 # Not sure this is causing other issues but has interfered with the reboot
 systemctl disable --now dnf-automatic.timer
 
