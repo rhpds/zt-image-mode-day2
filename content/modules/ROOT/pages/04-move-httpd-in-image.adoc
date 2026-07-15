@@ -1,7 +1,6 @@
 == What happened to our index file?
 
-You can return to the `Builder` tab to explore what happened
-to the new index.html file
+==== _Return to the `Builder` tab to explore what happened_
 
 We didn’t see any errors from the `+podman build+` when we created the
 image, so what happened inside the image?
@@ -55,7 +54,7 @@ cat Containerfile.index
 ----
 [source,dockerfile,nocopy]
 ----
-FROM registry.redhat.io/rhel10/rhel-bootc:10.1 
+FROM registry.redhat.io/rhel10/rhel-bootc:10.2 
 
 ADD etc /etc 
 
@@ -119,7 +118,7 @@ podman push registry-{guid}.{domain}/test-bootc:v3
 
 == Switch the VM to our newest version
 
-To apply this update, return to the `Image mode host` tab.
+==== _To apply this update, return to the `Image mode host` tab._
 
 Just like in the other exercises, we can use `+bootc switch+` to change
 to the image we just created with the updated Apache config.
