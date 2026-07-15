@@ -2,6 +2,14 @@
 # set -euxo pipefail
 set -x 
 
+# Unregister and re-register the VM
+dnf -y remove katello-ca-consumer-*
+subscription-manager clean
+subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --force
+
+# Install required packages
+dnf install -y podman skopeo
+
 # Log into terms based registry and stage bootc and bib images
 mkdir -p ~/.config/containers
 cat<<EOF> ~/.config/containers/auth.json
@@ -13,7 +21,6 @@ cat<<EOF> ~/.config/containers/auth.json
     }
   }
 EOF
-
 # Log into terms based registry and stage bootc and bib images
 BOOTC_RHEL_VER=10.2
 podman pull registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER registry.redhat.io/rhel10/bootc-image-builder:$BOOTC_RHEL_VER
