@@ -14,6 +14,7 @@ systemctl disable --now dnf-automatic.timer
 
 # Use local IP for FQDN instead of cluster IP
 echo "10.0.2.2 imrhel.${GUID}.${DOMAIN}" >> /etc/hosts
+exit 
 
 ## Convert a system to Image Mode
 # Command line created by system-reinstall-bootc 
