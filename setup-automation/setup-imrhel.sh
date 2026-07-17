@@ -1,8 +1,33 @@
 #!/bin/bash
 set -x 
 
+# GCP packages and services left in image delaying reboot
+systemctl stop google-disk-expand.service \
+	google-guest-agent.service  \
+	google-osconfig-agent.service  \
+	google-oslogin-cache.timer \
+	google-startup-scripts.service \
+	google-guest-agent-manager.service \
+	google-guest-compat-manager.service \
+	google-oslogin-cache.service \
+	google-shutdown-scripts.service
+
+dnf -y remove google-guest-agent \
+	google-compute-engine-oslogin \
+	google-compute-engine \
+	google-osconfig-agent
+
+# Unregister and re-register the VM
+dnf -y remove katello-ca-consumer-*
+subscription-manager clean
+subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --force
+
+# Install required packages
+dnf install -y podman skopeo
+
 # Not sure this is causing other issues but has interfered with the reboot
 systemctl disable --now dnf-automatic.timer
+
 
 # Use local IP for FQDN instead of cluster IP
 echo "10.0.2.2 imrhel.${GUID}.${DOMAIN}" >> /etc/hosts
