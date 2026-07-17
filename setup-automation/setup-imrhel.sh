@@ -1,8 +1,33 @@
 #!/bin/bash
 set -x 
 
+# GCP packages and services left in image delaying reboot
+systemctl stop google-disk-expand.service \
+	google-guest-agent.service  \
+	google-osconfig-agent.service  \
+	google-oslogin-cache.timer \
+	google-startup-scripts.service \
+	google-guest-agent-manager.service \
+	google-guest-compat-manager.service \
+	google-oslogin-cache.service \
+	google-shutdown-scripts.service
+
+dnf -y remove google-guest-agent \
+	google-compute-engine-oslogin \
+	google-compute-engine \
+	google-osconfig-agent
+
+# Unregister and re-register the VM
+dnf -y remove katello-ca-consumer-*
+subscription-manager clean
+subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --force
+
+# Install required packages
+dnf install -y podman skopeo
+
 # Not sure this is causing other issues but has interfered with the reboot
 systemctl disable --now dnf-automatic.timer
+
 
 # Use local IP for FQDN instead of cluster IP
 echo "10.0.2.2 imrhel.${GUID}.${DOMAIN}" >> /etc/hosts
@@ -11,7 +36,12 @@ echo "10.0.2.2 imrhel.${GUID}.${DOMAIN}" >> /etc/hosts
 # Command line created by system-reinstall-bootc 
 # Pulls the 9.6 basics image from quay to use as the baseline host in the lab
 #
-podman run --privileged --pid=host --user=root:root -v /var/lib/containers:/var/lib/containers -v /dev:/dev --security-opt label=type:unconfined_t -v /:/target quay.io/mmicene/im-day2-tgt:9.6 bootc install to-existing-root --acknowledge-destructive --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
+podman run --privileged --pid=host --user=root:root \
+    -v /var/lib/containers:/var/lib/containers \
+    -v /dev:/dev --security-opt label=type:unconfined_t \
+    -v /:/target \
+    quay.io/mmicene/im-day2-tgt:9.8 \
+    bootc install to-existing-root --acknowledge-destructive --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
 
 # With the new deployment created, we can copy directly into the /etc directory to make updates we want in the running bootc target
 # The deployment checksum and resulting directory will change on each provision, this is how we detect the location

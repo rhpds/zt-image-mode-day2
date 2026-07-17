@@ -15,7 +15,9 @@ Image mode can make testing these sorts of changes much easier, not only by simp
 
 == Update the Containerfile to RHEL 10
 
-Let's do something radical to explore changing the starting bootc image. In the previous lab, we were using RHEL 9. While we could just use a later minor version, let's see what happens if we use the RHEL 10 bootc base instead.
+Let's do something radical to explore changing the starting bootc image. 
+We have a web server image that was created using RHEL 9 that needs an update.
+While we could just use a later minor version, let's see what happens if we use the RHEL 10 bootc base instead.
 
 On the `Builder` tab, replace the FROM line with the RHEL 10 bootc base image from the catalog using vim.
 
@@ -26,7 +28,7 @@ vim Containerfile
 
 [source,dockerfile]
 ----
-FROM registry.redhat.io/rhel10/rhel-bootc:10.1
+FROM registry.redhat.io/rhel10/rhel-bootc:10.2
 ----
 
 === Use podman to build the image
@@ -52,7 +54,9 @@ podman push registry-{guid}.{domain}/test-bootc:el10
 
 == Connect to the VM running our bootc image
 
-Let’s connect to the virtual machine via SSH. Switch to the `Image mode host` tab.
+Let’s connect to the virtual machine via SSH. 
+
+==== _Switch to the `Image mode host` tab._
 
 [NOTE]
 ====
@@ -86,7 +90,7 @@ bootc switch registry-{guid}.{domain}/test-bootc:el10
 ----
 [NOTE]
 ====
-If something went wrong with the push step, you may get an error about an unknown manifest. If so, return to the `Builder` tab and double check that the push to the lab registry was succesful.
+If something went wrong with the push step, you may get an error about an unknown manifest. If so, return to the `Builder` tab and double check that the push to the lab registry was successful.
 ====
 
 At first glance, `+bootc switch+` doesn’t look very different from
@@ -136,4 +140,4 @@ You will also see the previous RHEL 9 image is still on disk as a roll back opti
 bootc status
 ----
 
-Once a host it running, changing the image in use is very straightforward, and can be useful for a number of reasons beyond radical changes like major versions. We'll stick with RHEL 10 from here, but let's explore a little more of what `bootc switch` can do for us in the next few exercises.
+Once a host is running, changing the image in use is very straightforward, and can be useful for a number of reasons beyond radical changes like major versions. We'll stick with RHEL 10 from here, but let's explore a little more of what `bootc switch` can do for us in the next few exercises.
