@@ -36,7 +36,7 @@ echo "Base images pulled" >> /tmp/progress.log
 setup_ssl_registry "${REGISTRY_HOST}"
 echo "Registry up at ${REGISTRY_HOST}" >> /tmp/progress.log
 
-SETUP_FILES=$(fetch_setup_files setup-files)
+fetch_setup_files setup-files
 cp "${SETUP_FILES}/config.json" /root/config.json
 cp "${SETUP_FILES}/Containerfile" /root/Containerfile
 cp "${SETUP_FILES}/Containerfile.index" /root/Containerfile.index
