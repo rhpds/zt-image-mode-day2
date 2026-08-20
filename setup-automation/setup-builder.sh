@@ -52,7 +52,6 @@ cp /etc/hosts /root/etc/hosts
 persist_env_var REGISTRY "${REGISTRY_HOST}"
 
 cleanup_registry_auth
-cleanup_subscription
 cleanup_certbot
 cleanup_tmpfiles
 echo "Builder setup complete" >> /tmp/progress.log
