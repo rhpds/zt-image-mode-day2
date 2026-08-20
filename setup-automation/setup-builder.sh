@@ -27,7 +27,7 @@ REGISTRY_HOST="registry-${GUID}.${DOMAIN}"
 setup_libvirt
 echo "Libvirt configured" >> /tmp/progress.log
 
-podman login registry.redhat.io --username token --password "${REGISTRY_PULL_TOKEN}"
+setup_pull_auth registry.redhat.io "${REGISTRY_PULL_TOKEN}"
 pull_images root \
   registry.redhat.io/rhel10/rhel-bootc:${BOOTC_RHEL_VER} \
   registry.redhat.io/rhel10/bootc-image-builder:${BOOTC_RHEL_VER}
