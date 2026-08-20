@@ -1,60 +1,74 @@
 #!/bin/bash
-set -x 
+set -x
+trap 'echo "FATAL: setup failed at line ${LINENO}" >> /tmp/progress.log; exit 1' ERR
 
-# GCP packages and services left in image delaying reboot
-systemctl stop google-disk-expand.service \
-	google-guest-agent.service  \
-	google-osconfig-agent.service  \
-	google-oslogin-cache.timer \
-	google-startup-scripts.service \
-	google-guest-agent-manager.service \
-	google-guest-compat-manager.service \
-	google-oslogin-cache.service \
-	google-shutdown-scripts.service
+echo "Setup imrhel host for day2 lab" > /tmp/progress.log
+chmod 666 /tmp/progress.log
 
-dnf -y remove google-guest-agent \
-	google-compute-engine-oslogin \
-	google-compute-engine \
-	google-osconfig-agent
+# Fetch and source common library
+LIBDIR=/tmp/lab-lib-$$
+git clone --depth=1 https://github.com/rhel-labs/lab-setup "${LIBDIR}"
+. "${LIBDIR}/common.sh"
 
-# Unregister and re-register the VM
-dnf -y remove katello-ca-consumer-*
-subscription-manager clean
-subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --force
+# --- lab configuration ---
+IMRHEL_HOST="imrhel.${GUID}.${DOMAIN}"
+# -------------------------
 
-# Install required packages
+# GCP agents left in image cause issues with reboot timing
+systemctl stop \
+  google-disk-expand.service \
+  google-guest-agent.service \
+  google-osconfig-agent.service \
+  google-oslogin-cache.timer \
+  google-startup-scripts.service \
+  google-guest-agent-manager.service \
+  google-guest-compat-manager.service \
+  google-oslogin-cache.service \
+  google-shutdown-scripts.service || true
+
+dnf -y remove \
+  google-guest-agent \
+  google-compute-engine-oslogin \
+  google-compute-engine \
+  google-osconfig-agent || true
+
+echo "GCP agents removed" >> /tmp/progress.log
+
+# System registration
+register_system
+echo "System registered" >> /tmp/progress.log
+
 dnf install -y podman skopeo
 
-# Not sure this is causing other issues but has interfered with the reboot
-systemctl disable --now dnf-automatic.timer
+# dnf-automatic interferes with the reboot timing during bootc conversion
+systemctl disable --now dnf-automatic.timer || true
 
+add_local_host "${IMRHEL_HOST}"
 
-# Use local IP for FQDN instead of cluster IP
-echo "10.0.2.2 imrhel.${GUID}.${DOMAIN}" >> /etc/hosts
-
-## Convert a system to Image Mode
-# Command line created by system-reinstall-bootc 
-# Pulls the 9.6 basics image from quay to use as the baseline host in the lab
-#
+# Convert system to image mode using a pre-built bootc image
 podman run --privileged --pid=host --user=root:root \
-    -v /var/lib/containers:/var/lib/containers \
-    -v /dev:/dev --security-opt label=type:unconfined_t \
-    -v /:/target \
-    quay.io/mmicene/im-day2-tgt:9.8 \
-    bootc install to-existing-root --acknowledge-destructive --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
+  -v /var/lib/containers:/var/lib/containers \
+  -v /dev:/dev --security-opt label=type:unconfined_t \
+  -v /:/target \
+  quay.io/mmicene/im-day2-tgt:9.8 \
+  bootc install to-existing-root --acknowledge-destructive \
+  --root-ssh-authorized-keys /target/home/rhel/.ssh/authorized_keys
+echo "bootc conversion complete" >> /tmp/progress.log
 
-# With the new deployment created, we can copy directly into the /etc directory to make updates we want in the running bootc target
-# The deployment checksum and resulting directory will change on each provision, this is how we detect the location
+# The deployment checksum directory changes each provision — detect it dynamically
 STATEROOT=$(ls -d /ostree/deploy/default/deploy/*/)
 
-# Overwrite the image configs with the lab configs
-# Add password root logins to sshD
-echo "PermitRootLogin yes" >> $STATEROOT/etc/ssh/sshd_config.d/ansible_permit_root_login.conf
+# Allow root SSH login for Ansible access to the new bootc deployment
+echo "PermitRootLogin yes" >> "${STATEROOT}/etc/ssh/sshd_config.d/ansible_permit_root_login.conf"
 
-# Copy the existing credentials to the new bootc tree
-# don't replace passwd/group files as this will cause issues with UID/GIDs
-\cp -f /etc/shadow $STATEROOT/etc/shadow
+# Carry existing credentials into the new bootc tree
+# passwd/group are not copied to preserve UID/GID consistency
+\cp -f /etc/shadow "${STATEROOT}/etc/shadow"
 
-# Use local IP for FQDN instead of cluster IP
-echo "10.0.2.2 imrhel.${GUID}.${DOMAIN}" >> $STATEROOT/etc/hosts
+# Replicate hosts entry into the bootc deployment
+# stateroot hosts file is not live — write directly, don't use add_local_host
+echo "10.0.2.2 ${IMRHEL_HOST}" >> "${STATEROOT}/etc/hosts"
 
+cleanup_subscription
+cleanup_tmpfiles
+echo "imrhel setup complete" >> /tmp/progress.log

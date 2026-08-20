@@ -1,114 +1,56 @@
 #!/bin/bash
-# set -euxo pipefail
-set -x 
-
-# Unregister and re-register the VM
-dnf -y remove katello-ca-consumer-*
-subscription-manager clean
-subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --force
-
-# Install required packages
-dnf install -y podman skopeo
-
-# Log into terms based registry and stage bootc and bib images
-mkdir -p ~/.config/containers
-cat<<EOF> ~/.config/containers/auth.json
-{
-    "auths": {
-      "registry.redhat.io": {
-        "auth": "${REGISTRY_PULL_TOKEN}"
-      }
-    }
-  }
-EOF
-# Log into terms based registry and stage bootc and bib images
-BOOTC_RHEL_VER=10.2
-podman pull registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER registry.redhat.io/rhel10/bootc-image-builder:$BOOTC_RHEL_VER
-
-# set up SSL for fully functioning registry
-# Enable EPEL for RHEL 10
-dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
-dnf install -y certbot
-
-# request certificates but don't log keys
-set +x
-certbot certonly --eab-kid "${ZEROSSL_EAB_KEY_ID}" --eab-hmac-key "${ZEROSSL_HMAC_KEY}" --server "https://acme.zerossl.com/v2/DV90" --standalone --preferred-challenges http -d registry-"${GUID}"."${DOMAIN}" --non-interactive --agree-tos -m trackbot@instruqt.com -v
-
-# Don't leak password to users
-rm /var/log/letsencrypt/letsencrypt.log
-
-# reset tracing
 set -x
+trap 'echo "FATAL: setup failed at line ${LINENO}" >> /tmp/progress.log; exit 1' ERR
 
-# run a local registry with the provided certs
-podman run --privileged -d \
-  --name registry \
-  -p 443:5000 \
-  -p 5000:5000 \
-  -v /etc/letsencrypt/live/registry-"${GUID}"."${DOMAIN}"/fullchain.pem:/certs/fullchain.pem \
-  -v /etc/letsencrypt/live/registry-"${GUID}"."${DOMAIN}"/privkey.pem:/certs/privkey.pem \
-  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/fullchain.pem \
-  -e REGISTRY_HTTP_TLS_KEY=/certs/privkey.pem \
-  quay.io/mmicene/registry:2
+echo "Adding wheel" > /root/post-run.log
+usermod -aG wheel rhel
 
-# For the target bootc system build, we need to set up a few config files to operate in the lab environment
-# create sudoers drop in and etc structure to add to container
-mkdir -p ~/etc/sudoers.d/
-echo "%wheel  ALL=(ALL)   NOPASSWD: ALL" >> ~/etc/sudoers.d/wheel
+echo "Setup build host for day2 lab" > /tmp/progress.log
+chmod 666 /tmp/progress.log
 
-# create config.json for BIB to add a user / pass
-cat <<EOF> ~/config.json
-{
-  "blueprint": {
-    "customizations": {
-      "user": [
-        {
-          "name": "core",
-          "password": "redhat",
-           "groups": [
-	            "wheel"
-	          ]
-        }
-      ]
-    }
-  }
-}
-EOF
+# Fetch and source common library
+LIBDIR=/tmp/lab-lib-$$
+git clone --depth=1 https://github.com/rhel-labs/lab-setup "${LIBDIR}"
+. "${LIBDIR}/common.sh"
 
-# create V3 index.html relocated containerfile
-cat <<EOM> ~/Containerfile
-FROM registry.redhat.io/rhel9/rhel-bootc:9.8
+# --- lab configuration ---
+BOOTC_RHEL_VER=10.2
+BUILDER_HOST="builder-${GUID}.${DOMAIN}"
+REGISTRY_HOST="registry-${GUID}.${DOMAIN}"
+# -------------------------
 
-ADD etc /etc
+register_system
+echo "System registered" >> /tmp/progress.log
 
-RUN dnf install -y httpd vim
+setup_libvirt
+echo "Libvirt configured" >> /tmp/progress.log
 
-RUN systemctl enable httpd
-EOM
+podman login registry.redhat.io --username token --password "${REGISTRY_PULL_TOKEN}"
+pull_images root \
+  registry.redhat.io/rhel10/rhel-bootc:${BOOTC_RHEL_VER} \
+  registry.redhat.io/rhel10/bootc-image-builder:${BOOTC_RHEL_VER}
+echo "Base images pulled" >> /tmp/progress.log
 
+setup_ssl_registry "${REGISTRY_HOST}"
+echo "Registry up at ${REGISTRY_HOST}" >> /tmp/progress.log
 
-# create V3 index.html relocated containerfile
-cat <<EOM> ~/Containerfile.index
-FROM registry.redhat.io/rhel10/rhel-bootc:$BOOTC_RHEL_VER
+SETUP_FILES=$(fetch_setup_files setup-files)
+cp "${SETUP_FILES}/config.json" /root/config.json
+cp "${SETUP_FILES}/Containerfile" /root/Containerfile
+cp "${SETUP_FILES}/Containerfile.index" /root/Containerfile.index
+echo "Setup files staged" >> /tmp/progress.log
 
-ADD etc /etc
+mkdir -p /root/etc/sudoers.d
+echo "%wheel  ALL=(ALL)   NOPASSWD: ALL" > /root/etc/sudoers.d/wheel
 
-RUN dnf install -y httpd vim
+add_local_host "${BUILDER_HOST}"
+add_local_host "${REGISTRY_HOST}"
+cp /etc/hosts /root/etc/hosts
 
-RUN systemctl enable httpd
+persist_env_var REGISTRY "${REGISTRY_HOST}"
 
-RUN echo "New application coming soon!" > /var/www/html/index.html
-
-RUN <<EOF 
-    mv /var/www /usr/share/www
-    sed -i 's-/var/www-/usr/share/www-' /etc/httpd/conf/httpd.conf
-EOF
-
-EOM
-
-# Fix DNS to use local IP instead of resolved
-echo "10.0.2.2 builder-${GUID}.${DOMAIN}" >> /etc/hosts
-echo "10.0.2.2 registry-${GUID}.${DOMAIN}" >> /etc/hosts
-
-# Fix registry.redhat.io pull token leak
-rm ~/.config/containers/auth.json
+cleanup_registry_auth
+cleanup_subscription
+cleanup_certbot
+cleanup_tmpfiles
+echo "Builder setup complete" >> /tmp/progress.log
