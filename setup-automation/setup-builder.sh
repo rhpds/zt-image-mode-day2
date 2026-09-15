@@ -28,7 +28,7 @@ setup_libvirt
 echo "Libvirt configured" >> /tmp/progress.log
 
 setup_redhat_registry_auth
-pull_images root \
+pull_private_images "${RH_REGISTRY_AUTHFILE}" root \
   registry.redhat.io/rhel10/rhel-bootc:${BOOTC_RHEL_VER} \
   registry.redhat.io/rhel10/bootc-image-builder:${BOOTC_RHEL_VER}
 echo "Base images pulled" >> /tmp/progress.log
