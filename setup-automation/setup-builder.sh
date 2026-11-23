@@ -7,6 +7,10 @@ dnf -y remove katello-ca-consumer-*
 subscription-manager clean
 subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --force
 
+# Allow podman builds to consume host RHSM entitlements so dnf inside the container can reach RHEL CDN
+mkdir -p /etc/containers
+printf '/etc/pki/entitlement:/etc/pki/entitlement:ro\n/etc/rhsm:/etc/rhsm:ro\n' > /etc/containers/mounts.conf
+
 # Install required packages
 dnf install -y podman skopeo
 
