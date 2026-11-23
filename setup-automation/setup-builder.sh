@@ -112,3 +112,7 @@ echo "10.0.2.2 registry-${GUID}.${DOMAIN}" >> /etc/hosts
 
 # Fix registry.redhat.io pull token leak
 rm ~/.config/containers/auth.json
+
+# Looking for podman 6 config
+podman system migrate
+podman start registry
