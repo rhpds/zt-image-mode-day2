@@ -9,6 +9,7 @@ subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --fo
 
 # Install required packages
 dnf install -y podman skopeo
+podman system migrate
 
 # Log into terms based registry and stage bootc and bib images
 mkdir -p ~/.config/containers
