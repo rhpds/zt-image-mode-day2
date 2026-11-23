@@ -9,7 +9,6 @@ subscription-manager register --activationkey=$ACTIVATION_KEY --org=$ORG_ID --fo
 
 # Install required packages
 dnf install -y podman skopeo
-podman system migrate
 
 # Log into terms based registry and stage bootc and bib images
 mkdir -p ~/.config/containers
@@ -113,3 +112,7 @@ echo "10.0.2.2 registry-${GUID}.${DOMAIN}" >> /etc/hosts
 
 # Fix registry.redhat.io pull token leak
 rm ~/.config/containers/auth.json
+
+# Looking for podman 6 config
+podman system migrate
+podman start registry
