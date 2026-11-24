@@ -3,15 +3,10 @@
 set -x 
 
 # GCP packages and services left in image resetting sysctls in live lab
-systemctl stop google-disk-expand.service \
+systemctl stop google-osconfig-agent.service  \
 	google-guest-agent.service  \
-	google-osconfig-agent.service  \
-	google-oslogin-cache.timer \
-	google-startup-scripts.service \
 	google-guest-agent-manager.service \
-	google-guest-compat-manager.service \
-	google-oslogin-cache.service \
-	google-shutdown-scripts.service
+	google-guest-compat-manager.service
 
 dnf -y remove google-guest-agent \
 	google-compute-engine-oslogin \
