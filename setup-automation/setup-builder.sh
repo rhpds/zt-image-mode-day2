@@ -125,3 +125,6 @@ RUN dnf -y install busybox
 EOF
 
 podman build -t test -f /tmp/Containerfile /tmp
+
+# Registry needs to be accessible
+sysctl -w net.ipv4.ip_forward=1
