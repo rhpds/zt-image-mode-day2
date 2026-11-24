@@ -118,7 +118,7 @@ podman system migrate
 podman start registry
 
 # Test container build, seems to pin something?
-cat <<EOF /tmp/Containerfile
+cat <<EOF> /tmp/Containerfile
 FROM registry.access.redhat.com/hi/core-runtime:latest-builder
 USER root
 RUN dnf -y install busybox
