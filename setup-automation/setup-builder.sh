@@ -2,6 +2,17 @@
 # set -euxo pipefail
 set -x 
 
+# GCP packages and services left in image resetting sysctls in live lab
+systemctl stop google-osconfig-agent.service  \
+	google-guest-agent.service  \
+	google-guest-agent-manager.service \
+	google-guest-compat-manager.service
+
+dnf -y remove google-guest-agent \
+	google-compute-engine-oslogin \
+	google-compute-engine \
+	google-osconfig-agent
+
 # Unregister and re-register the VM
 dnf -y remove katello-ca-consumer-*
 subscription-manager clean
