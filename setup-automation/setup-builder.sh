@@ -125,6 +125,8 @@ RUN dnf -y install busybox
 EOF
 
 podman build -t test -f /tmp/Containerfile /tmp
+# Clean up the test image if built, the build doesn't actually need to succeed apparently
+podman rmi -f test
 
 # Registry needs to be accessible
 sysctl -w net.ipv4.ip_forward=1
