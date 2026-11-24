@@ -127,17 +127,3 @@ rm ~/.config/containers/auth.json
 # Looking for podman 6 config
 podman system migrate
 podman start registry
-
-# Test container build, seems to pin something?
-# cat <<EOF> /tmp/Containerfile
-# FROM registry.access.redhat.com/hi/core-runtime:latest-builder
-# USER root
-# RUN dnf -y install busybox
-# EOF
-
-# podman build -t test -f /tmp/Containerfile /tmp
-# Clean up the test image if built, the build doesn't actually need to succeed apparently
-# podman rmi -f test
-
-# Registry needs to be accessible
-# sysctl -w net.ipv4.ip_forward=1
