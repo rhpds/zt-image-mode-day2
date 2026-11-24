@@ -2,6 +2,22 @@
 # set -euxo pipefail
 set -x 
 
+# GCP packages and services left in image resetting sysctls in live lab
+systemctl stop google-disk-expand.service \
+	google-guest-agent.service  \
+	google-osconfig-agent.service  \
+	google-oslogin-cache.timer \
+	google-startup-scripts.service \
+	google-guest-agent-manager.service \
+	google-guest-compat-manager.service \
+	google-oslogin-cache.service \
+	google-shutdown-scripts.service
+
+dnf -y remove google-guest-agent \
+	google-compute-engine-oslogin \
+	google-compute-engine \
+	google-osconfig-agent
+
 # Unregister and re-register the VM
 dnf -y remove katello-ca-consumer-*
 subscription-manager clean
@@ -118,15 +134,15 @@ podman system migrate
 podman start registry
 
 # Test container build, seems to pin something?
-cat <<EOF> /tmp/Containerfile
-FROM registry.access.redhat.com/hi/core-runtime:latest-builder
-USER root
-RUN dnf -y install busybox
-EOF
+# cat <<EOF> /tmp/Containerfile
+# FROM registry.access.redhat.com/hi/core-runtime:latest-builder
+# USER root
+# RUN dnf -y install busybox
+# EOF
 
-podman build -t test -f /tmp/Containerfile /tmp
+# podman build -t test -f /tmp/Containerfile /tmp
 # Clean up the test image if built, the build doesn't actually need to succeed apparently
-podman rmi -f test
+# podman rmi -f test
 
 # Registry needs to be accessible
-sysctl -w net.ipv4.ip_forward=1
+# sysctl -w net.ipv4.ip_forward=1
